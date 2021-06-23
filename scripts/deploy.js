@@ -23,7 +23,17 @@ async function main() {
   const token = await Token.deploy();
   await token.deployed();
 
+  const NFTimeshare = await ethers.getContractFactory("NFTimeshare");
+  const nftimeshare = await NFTimeshare.deploy();
+  await nftimeshare.deployed();
+
+  const NFTimeshareMonth = await ethers.getContractFactory("NFTimeshareMonth");
+  const nftimesharemonth = await NFTimeshareMonth.deploy();
+  await nftimesharemonth.deployed();
+
   console.log("Token address:", token.address);
+  console.log("NFTimeshare addr:", nftimeshare.address);
+  console.log("NFTimeshareMonth addr:", nftimesharemonth.address);
 
   // We also save the contract's artifacts and address in the frontend directory
   saveFrontendFiles(token);
