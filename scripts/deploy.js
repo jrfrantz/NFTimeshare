@@ -35,6 +35,10 @@ async function main() {
   console.log("NFTimeshare addr:", nftimeshare.address);
   console.log("NFTimeshareMonth addr:", nftimesharemonth.address);
 
+  // set links between Timeshare and TimeshareMonths
+  await nftimeshare.setNFTimeshareMonthAddress(nftimesharemonth.address);
+  await nftimesharemonth.setNFTimeshareAddress(nftimeshare.address);
+
   // We also save the contract's artifacts and address in the frontend directory
   saveFrontendFiles(token);
 }

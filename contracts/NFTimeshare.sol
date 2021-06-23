@@ -57,9 +57,12 @@ contract NFTimeshare is ERC721Enumerable, ERC721Holder, Ownable {
 
     }
 
-    // TODO: make this just handled by the deployer
     function setNFTimeshareMonthAddress(address _addr) public onlyOwner {
         _NFTimeshareMonths = NFTimeshareMonth(_addr);
+    }
+
+    function getNFTimeshareMonthAddress() public view returns (address) {
+      return address(_NFTimeshareMonths);
     }
 
     function getWrappedNFT(uint256 tokenId) public view returns (address, uint256) {
