@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "hardhat/console.sol";
 import "./NFTimeshare.sol";
 
 contract NFTimeshareMonth is ERC721Enumerable, Ownable {
@@ -48,7 +49,6 @@ contract NFTimeshareMonth is ERC721Enumerable, Ownable {
     function makeTimesharesFor(uint256 timeshareTokenId, address to) external onlyTimeshare {
         // require msg.sender owns the times
         require(msg.sender == address(_NFTimeshare), "Only the parent NFTimeshare contract can mint TimeshareMonths");
-        require(msg.sender == _NFTimeshare.getApproved(timeshareTokenId), "Tx sender isn't approved to remove these timeshares");
 
         uint256[12] memory newMonthTokenIds;
         for (uint8 i = 0; i < 12; i++) {

@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "hardhat/console.sol";
 import "./NFTimeshareMonth.sol";
 import "./utils/BokkyPooBahsDateTimeLibrary.sol";
 
@@ -30,7 +31,7 @@ contract NFTimeshare is ERC721Enumerable, ERC721Holder, Ownable {
 
     // given an an NFT (contract + tokenId), wrap it and mint it into timeshares.
     // this contract must be approved to operate it. _to must be able to receive erc721s.
-    function deposit(address _underlying, uint256 _underlyingTokenId, address _from, address _to) public virtual needsTimeshareMonths {
+    function deposit(address _underlying, uint256 _underlyingTokenId, address _from, address _to) public needsTimeshareMonths {
         _tokenIds.increment();
         uint256 newTokenId = _tokenIds.current();
 
@@ -70,7 +71,9 @@ contract NFTimeshare is ERC721Enumerable, ERC721Holder, Ownable {
         UnderlyingNFT memory underlying = _wrappedNFTs[tokenId];
         return (underlying._contractAddr, underlying._tokenId);
     }
-
+    function getTokenIdForUnderlyingNFT(address addr, uint256 externalTokenId) public view returns (uint256) {
+      return _tokenIdForUnderlying[addr][externalTokenId];
+    }
     function tokenURI(uint256 tokenId) public view virtual override needsTimeshareMonths returns (string memory) {
         UnderlyingNFT memory underlying = _wrappedNFTs[tokenId];
         string memory retval = IERC721Metadata(underlying._contractAddr).tokenURI(underlying._tokenId);
@@ -80,7 +83,10 @@ contract NFTimeshare is ERC721Enumerable, ERC721Holder, Ownable {
         require(address(_NFTimeshareMonths) != address(0x0), "NFTimeshare contract address hasn't been set up");
         _;
     }
-
+    modifier disallowed {
+        require(false, "Disallowed operation on NFTimeshare");
+        _;
+    }
     function balanceOf(address owner) public view virtual override needsTimeshareMonths returns (uint256){
         uint256 numTSMonthsOwned = _NFTimeshareMonths.balanceOf(owner);
         uint256 curMonth = BokkyPooBahsDateTimeLibrary.getMonth(block.timestamp) - 1; // bokky is 1-indexed
@@ -102,31 +108,32 @@ contract NFTimeshare is ERC721Enumerable, ERC721Holder, Ownable {
         return _NFTimeshareMonths.ownerOf(timeshareMonths[curMonth-1]);
     }
 
-    function safeTransferFrom(address from, address to, uint256 tokenId) public virtual override {
+    function safeTransferFrom(address from, address to, uint256 tokenId) public override disallowed {
         // override block
         return;
     }
 
-    function transferFrom(address from, address to, uint256 tokenId) public virtual override {
+    function transferFrom(address from, address to, uint256 tokenId) public override disallowed {
         // override block
         return;
     }
 
-    function approve(address to, uint256 tokenId) public virtual override {
+    function approve(address to, uint256 tokenId) public virtual override disallowed {
         // block
         return;
     }
 
-    function getApproved(uint256 tokenId) public view virtual override returns (address) {
+    function getApproved(uint256 tokenId) public view virtual override disallowed returns (address)  {
         return address(0);
     }
-    function setApprovalForAll(address operator, bool _approved) public virtual override {
+    function setApprovalForAll(address operator, bool _approved) public virtual override disallowed {
         return;
     }
-    function isApprovedForAll(address owner, address operator) public view virtual override returns (bool) {
+    function isApprovedForAll(address owner, address operator) public view virtual override disallowed returns (bool) {
         return false;
     }
-    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public virtual override {
+    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public virtual override disallowed {
         return;
     }
+
 }
