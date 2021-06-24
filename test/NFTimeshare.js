@@ -4,6 +4,7 @@
 // Hardhat tests are normally written with Mocha and Chai.
 
 // We import Chai to use its asserting functions here.
+// TODO: delete all the Token.sol and Token.js files
 const { expect } = require("chai");
 const {
   BN,           // Big Number support
@@ -360,5 +361,55 @@ describe("NFTimeshare and NFTimeshareMonths contract", function () {
       addr2ExternalNFT    = tExternalNFT.connect(addr2);
     });
 
+    it("Should restore ownership of the NFT", async function() {
+      var externalNFTOwner = await tExternalNFT.ownerOf(externalTokenId);
+      expect(externalNFTOwner).to.be.equal(tTimeshare.address);
+
+      console.log("Timeshare contract addr", tTimeshare.address);
+      console.log("Address 1, ", addr1.address)
+      await tTimeshare.redeem(timeshareTokenId, addr1.address);
+      externalNFTOwner = await tExternalNFT.ownerOf(externalTokenId);
+      expect(externalNFTOwner).to.be.equal(addr1.address);
+    });
+
+    it("Can't be redeemed twice", async function() {
+      await tTimeshare.redeem(timeshareTokenId, addr1.address);
+      expect(tTimeshare.redeem(timeshareTokenId, addr1.address))
+      .to.be.revertedWith("Redeem Timeshare: Nonexistent tokenId");
+    });
+    it("Can be redeemed with approval vs ownership", async function() {
+      await tTimeshareMonth.transferFrom(
+        addr1.address,
+        addr2.address,
+        monthTokenIds[0]
+      );
+      await addr2TimeshareMonth.approve(addr1.address, monthTokenIds[0]);
+
+      await tTimeshare.redeem(timeshareTokenId, addr1.address);
+      var externalNFTOwner = await tExternalNFT.ownerOf(externalTokenId);
+      expect(externalNFTOwner).to.be.equal(addr1.address);
+    });
+    it("Can't be redeemed if you own SOME", async function() {
+      await tTimeshareMonth.transferFrom(
+        addr1.address,
+        addr2.address,
+        monthTokenIds[0]
+      );
+      expect(tTimeshare.redeem(timeshareTokenId, addr1.address))
+      .to.be.revertedWith("Redeem: Sender can't operate all TimeshareMonths");
+      var externalNFTOwner = await tExternalNFT.ownerOf(externalTokenId);
+      expect(externalNFTOwner).to.be.equal(tTimeshare.address);
+    });
+    it("Can be sent to a different owner", async function() {
+      await tTimeshare.redeem(timeshareTokenId, addr2.address);
+      var externalNFTOwner = await tExternalNFT.ownerOf(externalTokenId);
+      expect(externalNFTOwner).to.be.equal(addr2.address);
+    });
+    it("Can't be redeemed by non-participant", async function() {
+      expect(addr2Timeshare.redeem(timeshareTokenId, addr1.address))
+      .to.be.revertedWith("Redeem: Sender can't operate all TimeshareMonths");
+    });
+
+  });
 
 });

@@ -11,7 +11,10 @@ import "hardhat/console.sol";
 import "./NFTimeshareMonth.sol";
 import "./utils/BokkyPooBahsDateTimeLibrary.sol";
 
-// TODO: shouldn't really be an ERC721... it implements metadata (and maybe enumerable) but it's not really a token since it's synthetic. it could have its own interface?
+// TODO: should this actually be an ERC721 or its own thing?
+// TODO: make an interface for contracts
+// TODO: make upgradeable through openzeppelin
+// TODO: emit some Events
 contract NFTimeshare is ERC721Enumerable, ERC721Holder, Ownable {
     using Counters for Counters.Counter;
     using BokkyPooBahsDateTimeLibrary for uint256;
@@ -49,12 +52,11 @@ contract NFTimeshare is ERC721Enumerable, ERC721Holder, Ownable {
     function redeem(uint256 tokenId, address _to) public virtual needsTimeshareMonths {
         UnderlyingNFT memory underlyingNFT = _wrappedNFTs[tokenId];
         require(underlyingNFT._contractAddr != address(0) && underlyingNFT._tokenId != 0, "Redeem Timeshare: Nonexistent tokenId");
-        require(_NFTimeshareMonths.isApprovedForAllMonths(msg.sender, tokenId), "Redeem: Sender can't operate all TimeshareMonths");
 
         delete _tokenIdForUnderlying[underlyingNFT._contractAddr][underlyingNFT._tokenId];
         delete _wrappedNFTs[tokenId];
 
-        _NFTimeshareMonths.burnTimesharesFor(tokenId);
+        _NFTimeshareMonths.burnTimeshareMonthsFor(msg.sender, tokenId);
         IERC721(underlyingNFT._contractAddr).safeTransferFrom(address(this), _to, underlyingNFT._tokenId);
 
     }

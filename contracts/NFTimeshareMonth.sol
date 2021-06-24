@@ -64,12 +64,10 @@ contract NFTimeshareMonth is ERC721Enumerable, Ownable {
         }
     }
 
-    function burnTimesharesFor(uint256 timeshareTokenId) external onlyTimeshare {
-        // TODO require this month to be valid
+    function burnTimeshareMonthsFor(address spender, uint256 timeshareTokenId) external onlyTimeshare {
         uint256[12] memory months = _monthsForTimeshare[timeshareTokenId];
         require(months[0] != 0, "No TimeshareMonths to burn for tokenId");
-
-        //TODO require msg.sender to be approved for EACH MONTH in months
+        require(isApprovedForAllMonths(spender, timeshareTokenId), "Redeem: Sender can't operate all TimeshareMonths");
 
         delete _monthsForTimeshare[timeshareTokenId];
         for (uint8 i = 0; i < 12; i++) {
