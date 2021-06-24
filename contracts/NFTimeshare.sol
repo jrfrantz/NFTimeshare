@@ -14,6 +14,7 @@ import "./utils/BokkyPooBahsDateTimeLibrary.sol";
 // TODO: shouldn't really be an ERC721... it implements metadata (and maybe enumerable) but it's not really a token since it's synthetic. it could have its own interface?
 contract NFTimeshare is ERC721Enumerable, ERC721Holder, Ownable {
     using Counters for Counters.Counter;
+    using BokkyPooBahsDateTimeLibrary for uint256;
 
     Counters.Counter private _tokenIds;
     NFTimeshareMonth private _NFTimeshareMonths;
@@ -89,7 +90,7 @@ contract NFTimeshare is ERC721Enumerable, ERC721Holder, Ownable {
     }
     function balanceOf(address owner) public view virtual override needsTimeshareMonths returns (uint256){
         uint256 numTSMonthsOwned = _NFTimeshareMonths.balanceOf(owner);
-        uint256 curMonth = BokkyPooBahsDateTimeLibrary.getMonth(block.timestamp) - 1; // bokky is 1-indexed
+        uint256 curMonth = block.timestamp.getMonth()-1;
         uint256 activeTimeshares = 0;
         for (uint256 i = 0; i < numTSMonthsOwned; i++) {
             uint256 monthTokenId  = _NFTimeshareMonths.tokenOfOwnerByIndex(owner, i);
@@ -103,9 +104,9 @@ contract NFTimeshare is ERC721Enumerable, ERC721Holder, Ownable {
 
     function ownerOf(uint256 tokenId) public view virtual override returns (address) {
         // -- override so that it only shows WHOEVER HOLDS THE CURRENT MONTH
-        uint256 curMonth = BokkyPooBahsDateTimeLibrary.getMonth(block.timestamp); // 1-indexed
+        uint256 curMonth = block.timestamp.getMonth()-1;
         uint256[12] memory timeshareMonths = _NFTimeshareMonths.getTimeshareMonths(tokenId); // 0-indexed
-        return _NFTimeshareMonths.ownerOf(timeshareMonths[curMonth-1]);
+        return _NFTimeshareMonths.ownerOf(timeshareMonths[curMonth]);
     }
 
     function safeTransferFrom(address from, address to, uint256 tokenId) public override disallowed {

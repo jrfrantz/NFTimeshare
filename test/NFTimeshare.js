@@ -10,18 +10,50 @@ const {
   constants,    // Common constants, like the zero address and largest integers
   expectEvent,  // Assertions for emitted events
   expectRevert, // Assertions for transactions that should fail
+  time
 } = require('@openzeppelin/test-helpers');
+
+const THIRTY_DAYS_IN_SECONDS = 30*24*60*60;
+
+async function increaseTime(addlSeconds) {
+  var blockNum;
+  var lastBlock;
+
+  blockNum = await ethers.provider.getBlockNumber();
+  lastBlock = await ethers.provider.getBlock(blockNum)
+
+  await ethers.provider.send("evm_increaseTime", [addlSeconds]);
+  await ethers.provider.send("evm_mine");
+
+  blockNum = await ethers.provider.getBlockNumber();
+  lastBlock = await ethers.provider.getBlock(blockNum);
+  return lastBlock.timestamp;
+}
+
+async function getLastBlockTime() {
+  var blockNum = await ethers.provider.getBlockNumber();
+  return (await ethers.provider.getBlock(blockNum)).timestamp;
+}
+
+async function setTime(seconds) {
+  var curTime = await getLastBlockTime();
+  //console.log("Simple diff is ", seconds - curTime)
+  return await increaseTime(seconds - curTime);
+}
 
 describe("NFTimeshare and NFTimeshareMonths contract", function () {
   let NFTimeshare;
   let NFTimeshareMonth;
   let TestNFT;
+  let BokkyPooBahsDateTimeLibrary;
   let hhTimeshare;
   let hhTimeshareMonth;
   let hhTestNFT;
+  let bokkyPooBahsDateTimeLibrary;
   let owner;
   let addr1;
   let addr2;
+  let addr3;
   let addrs;
   let externalTokenId;
 
@@ -30,7 +62,8 @@ describe("NFTimeshare and NFTimeshareMonths contract", function () {
     NFTimeshare      = await ethers.getContractFactory("NFTimeshare");
     NFTimeshareMonth = await ethers.getContractFactory("NFTimeshareMonth")
     TestNFT          = await ethers.getContractFactory("TestNFT");
-    [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
+    BokkyPooBahsDateTimeLibrary = await ethers.getContractFactory("BokkyPooBahsDateTimeLibrary");
+    [owner, addr1, addr2, addr3, ...addrs] = await ethers.getSigners();
 
     // To deploy our contract, we just have to call Token.deploy() and await
     // for it to be deployed(), which happens onces its transaction has been
@@ -38,10 +71,13 @@ describe("NFTimeshare and NFTimeshareMonths contract", function () {
     hhTimeshare      = await NFTimeshare.deploy();
     hhTimeshareMonth = await NFTimeshareMonth.deploy();
     hhTestNFT        = await TestNFT.deploy();
+    bokkyPooBahsDateTimeLibrary = await BokkyPooBahsDateTimeLibrary.deploy();
+    //console.log(bokkyPooBahsDateTimeLibrary);
 
     await hhTimeshare.deployed();
     await hhTimeshareMonth.deployed();
     await hhTestNFT.deployed();
+    await bokkyPooBahsDateTimeLibrary.deployed();
 
     // set links between Timeshare and TimeshareMonths
     await hhTimeshare.setNFTimeshareMonthAddress(hhTimeshareMonth.address);
@@ -179,6 +215,9 @@ describe("NFTimeshare and NFTimeshareMonths contract", function () {
   describe("ERC721 TimeshareMonths", function() {
     let timeshareTokenId;
     let monthTokenIds;
+    let addr2TimeshareMonth;
+    let addr2Timeshare;
+    let addr2ExternalNFT;
     beforeEach(async function() {
       await tExternalNFT.approve(tTimeshare.address, 1);
       await tTimeshare.deposit(
@@ -192,12 +231,134 @@ describe("NFTimeshare and NFTimeshareMonths contract", function () {
         externalTokenId
       );
       monthTokenIds = await tTimeshareMonth.getTimeshareMonths(timeshareTokenId);
+
+      addr2TimeshareMonth = tTimeshareMonth.connect(addr2);
+      addr2Timeshare      = tTimeshare.connect(addr2);
+      addr2ExternalNFT    = tExternalNFT.connect(addr2);
     });
 
-    xit("Should be able to trade months", async function() {});
-    xit("Should be able to approve months", async function() {});
-    xit("Should update owners each month", async function() {});
-    xit("Should wrap around December", async function() {});
+    it("Should be able to trade months", async function() {
+      var oldOwner = await tTimeshareMonth.ownerOf(monthTokenIds[11]);
+      await tTimeshareMonth.transferFrom(
+        addr1.address,
+        addr2.address,
+        monthTokenIds[11]
+      );
+      var newOwner = await tTimeshareMonth.ownerOf(monthTokenIds[11]);
+      expect(oldOwner).to.not.be.equal(newOwner);
+      expect(newOwner).to.equal(addr2.address);
+    });
+    it("Should be able to approve months", async function() {
+      await tTimeshareMonth.approve(addr2.address, monthTokenIds[6]);
+      await addr2TimeshareMonth.transferFrom(
+        addr1.address,
+        addr2.address,
+        monthTokenIds[6]
+      );
+      expect(await addr2TimeshareMonth.ownerOf(monthTokenIds[6]))
+      .to.be.equal(addr2.address);
+    });
+    it("Should be able to increase time correctly", async function() {
+      var startTime = await getLastBlockTime();
+      await increaseTime(THIRTY_DAYS_IN_SECONDS);
+      var finTime   = await getLastBlockTime();
+      expect(finTime - startTime).to.be.closeTo(THIRTY_DAYS_IN_SECONDS, 5);
+
+      // blockchain uses seconds but js Date uses millis
+      var oldMonth = new Date(startTime*1000).getMonth();
+      var newMonth = new Date(finTime*1000).getMonth();
+      expect(newMonth - oldMonth).to.be.equal(1);
+    });
+    it("Should be able to set to any month", async function() {
+      var november = Math.floor(new Date('2021-11-02') / 1000);
+      var newTime = await setTime(november);
+
+      expect(new Date(newTime*1000).getMonth()).to.equal(10) // 0-indexed
+    });
+    it("Should update owner correctly each month", async function() {
+      var january  = Math.floor(new Date('2022-01-02')/ 1000);
+      var february = Math.floor(new Date('2022-02-02')/ 1000);
+
+      await setTime(january);
+
+      await tTimeshareMonth.transferFrom(
+        addr1.address,
+        addr2.address,
+        monthTokenIds[0]
+      );
+      await tTimeshareMonth.transferFrom(
+        addr1.address,
+        addr3.address,
+        monthTokenIds[1]
+      );
+
+      var curOwner = await tTimeshare.ownerOf(timeshareTokenId);
+      expect(curOwner).to.be.equal(addr2.address);
+
+      await setTime(february);
+      var newOwner = await tTimeshare.ownerOf(timeshareTokenId);
+      expect(newOwner).to.be.equal(addr3.address);
+
+    });
+    it("Should wrap around December", async function() {
+      var december = Math.floor(new Date('2022-12-10')/ 1000);
+      var jan      = Math.floor(new Date('2023-01-05')/ 1000);
+
+      await setTime(december);
+
+      await tTimeshareMonth.transferFrom(
+        addr1.address,
+        addr2.address,
+        monthTokenIds[11]
+      );
+      await tTimeshareMonth.transferFrom(
+        addr1.address,
+        addr3.address,
+        monthTokenIds[0]
+      );
+
+      var curOwner = await tTimeshare.ownerOf(timeshareTokenId);
+      expect(curOwner).to.be.equal(addr2.address);
+
+      await setTime(jan);
+      var newOwner = await tTimeshare.ownerOf(timeshareTokenId);
+      expect(newOwner).to.be.equal(addr3.address);
+    });
+    it("Should get right month for monthTokenIds", async function() {
+      for (let i = 0; i < monthTokenIds.length; i++) {
+        var mo = await tTimeshareMonth.month(monthTokenIds[i]);
+        expect(mo).to.equal(i);
+      }
+    });
   });
+
+
+
+
+  describe("Redeeming Timeshares", function() {
+    let timeshareTokenId;
+    let monthTokenIds;
+    let addr2TimeshareMonth;
+    let addr2Timeshare;
+    let addr2ExternalNFT;
+    beforeEach(async function() {
+      await tExternalNFT.approve(tTimeshare.address, 1);
+      await tTimeshare.deposit(
+        tExternalNFT.address,
+        externalTokenId,
+        addr1.address,
+        addr1.address,
+      );
+      timeshareTokenId = await tTimeshare.getTokenIdForUnderlyingNFT(
+        tExternalNFT.address,
+        externalTokenId
+      );
+      monthTokenIds = await tTimeshareMonth.getTimeshareMonths(timeshareTokenId);
+
+      addr2TimeshareMonth = tTimeshareMonth.connect(addr2);
+      addr2Timeshare      = tTimeshare.connect(addr2);
+      addr2ExternalNFT    = tExternalNFT.connect(addr2);
+    });
+
 
 });

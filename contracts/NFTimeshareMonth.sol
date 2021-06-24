@@ -85,6 +85,11 @@ contract NFTimeshareMonth is ERC721Enumerable, Ownable {
         return _monthsForTimeshare[timeshareTokenId];
     }
 
+    // get the tokenId of the parent NFTimeshare for this NFTimeshareMonth
+    function getParentTimeshare(uint256 timeshareMonthTokenId) public view virtual returns (uint256) {
+      return _timeshareForMonth[timeshareMonthTokenId];
+    }
+
     function setNFTimeshareAddress(address addr) public onlyOwner {
         _NFTimeshare = NFTimeshare(addr);
     }

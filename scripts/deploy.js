@@ -23,8 +23,24 @@ async function main() {
   const token = await Token.deploy();
   await token.deployed();
 
+
+  /*
+  const timeLibrary = await deploy("BokkyPooBahsDateTimeLibrary", {
+      from: <deployer>
+  });
+  */
+
   const NFTimeshare = await ethers.getContractFactory("NFTimeshare");
   const nftimeshare = await NFTimeshare.deploy();
+  /*
+  const example = await deploy("Example", {
+    from: <deployer>
+    args: ["example string argument for the 'Example' contract constructor"],
+    libraries: {
+        ExampleLibrary: exampleLibrary.address
+    }
+});
+  */
   await nftimeshare.deployed();
 
   const NFTimeshareMonth = await ethers.getContractFactory("NFTimeshareMonth");

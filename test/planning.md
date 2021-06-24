@@ -20,6 +20,7 @@ Redemption:
 - correctly restores NFT ownership
 - can't be redeemed twice
 - Month tokens vanish
+- can be redeemed by someone who isn't the original owner
 
 Redemption permissions
 - also works when redeemer is approved-but-not-owner, too
