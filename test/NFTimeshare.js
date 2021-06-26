@@ -38,7 +38,6 @@ async function getLastBlockTime() {
 
 async function setTime(seconds) {
   var curTime = await getLastBlockTime();
-  //console.log("Simple diff is ", seconds - curTime)
   return await increaseTime(seconds - curTime);
 }
 
@@ -365,8 +364,6 @@ describe("NFTimeshare and NFTimeshareMonths contract", function () {
       var externalNFTOwner = await tExternalNFT.ownerOf(externalTokenId);
       expect(externalNFTOwner).to.be.equal(tTimeshare.address);
 
-      console.log("Timeshare contract addr", tTimeshare.address);
-      console.log("Address 1, ", addr1.address)
       await tTimeshare.redeem(timeshareTokenId, addr1.address);
       externalNFTOwner = await tExternalNFT.ownerOf(externalTokenId);
       expect(externalNFTOwner).to.be.equal(addr1.address);

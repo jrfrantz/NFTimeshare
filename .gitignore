@@ -6,3 +6,6 @@ cache
 artifacts
 
 .DS_Store
+.secrets
+secrets
+secrets.json

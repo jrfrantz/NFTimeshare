@@ -20,6 +20,6 @@ contract TestNFT is ERC721Enumerable {
     }
 
     function tokenURI(uint256 tokenId) public virtual override view returns (string memory) {
-        return Strings.toString(tokenId);
+        return string(abi.encodePacked("http://my-json-server.typicode.com/abcoathup/samplenft/tokens/", Strings.toString(tokenId)));
     }
 }

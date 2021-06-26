@@ -1,0 +1,6 @@
+
+
+# Rinkeby (network 4)
+NFTimeshare is at "0x86Deb62A169e0dA5a9392598D6249008c6a97477",
+NFTimeshareMonth addr is at "0x81559aC577b0d1219a8C801f0a58bA559707AefC",
+TestNFT is at  "0x6465C39d618A7Df9E81C16C5F270e606FF05c830"

@@ -19,6 +19,23 @@ contract NFTimeshare is ERC721Enumerable, ERC721Holder, Ownable {
     using Counters for Counters.Counter;
     using BokkyPooBahsDateTimeLibrary for uint256;
 
+
+    event Deposit(
+      address indexed holder,
+      address indexed sender,
+      address indexed recipient,
+      address wrapped_contract,
+      uint256 wrapped_tokenId,
+      uint256 timeshareTokenId
+    );
+    event Redeem(
+      address indexed sender,
+      address indexed recipient,
+      address unwrapped_contract,
+      uint256 unwrapped_tokenId,
+      uint256 timeshareTokenId
+    );
+
     Counters.Counter private _tokenIds;
     NFTimeshareMonth private _NFTimeshareMonths;
 
@@ -44,6 +61,7 @@ contract NFTimeshare is ERC721Enumerable, ERC721Holder, Ownable {
 
         _NFTimeshareMonths.makeTimesharesFor(newTokenId, _to);
         IERC721(_underlying).safeTransferFrom(_from, address(this), _underlyingTokenId);
+        emit Deposit(_from, msg.sender, _to, _underlying, _underlyingTokenId, newTokenId);
     }
 
     // redeem a wrapped NFT if you own all the timeshares.
@@ -58,6 +76,7 @@ contract NFTimeshare is ERC721Enumerable, ERC721Holder, Ownable {
 
         _NFTimeshareMonths.burnTimeshareMonthsFor(msg.sender, tokenId);
         IERC721(underlyingNFT._contractAddr).safeTransferFrom(address(this), _to, underlyingNFT._tokenId);
+        emit Redeem(msg.sender, _to, underlyingNFT._contractAddr, underlyingNFT._tokenId, tokenId);
 
     }
 

@@ -5,6 +5,8 @@ require("@nomiclabs/hardhat-waffle");
 // testing the frontend.
 require("./tasks/faucet");
 
+const { alchemyApiKey, mnemonic } = require('./secrets.json');
+
 module.exports = {
   solidity: {
     compilers: [
@@ -12,5 +14,12 @@ module.exports = {
       {version: "0.8.4"},
       {version: "0.4.16"}
     ],
-  }
+  },
+  networks: {
+     rinkeby: {
+       url: `${alchemyApiKey}`,
+       accounts: {mnemonic: mnemonic}
+     }
+  },
+
 };
