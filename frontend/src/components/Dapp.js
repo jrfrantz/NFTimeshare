@@ -11,6 +11,10 @@ import NFTimeshareMonthArtifact from "../contracts/NFTimeshareMonth.json";
 import TestNFTArtifact from "../contracts/TestNFT.json";
 import contractAddress from "../contracts/contract-address.json";
 
+import Container from "react-bootstrap/Container";
+import IframeResizer from 'iframe-resizer-react'
+
+
 // All the logic of this dapp is contained in the Dapp component.
 // These other components are just presentational ones: they don't have any
 // logic. They just render HTML.
@@ -21,6 +25,7 @@ import { Transfer } from "./Transfer";
 import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
 import { NoTokensMessage } from "./NoTokensMessage";
+import { TimeshareMonths } from "./TimeshareMonths";
 
 const axios = require('axios');
 
@@ -59,18 +64,19 @@ export class Dapp extends React.Component {
       txBeingSent: undefined,
       transactionError: undefined,
       networkError: undefined,
+      timeshareMonths: undefined
     };
 
     this.state = this.initialState;
   }
 
   render() {
-    console.log("hello?");
     // Ethereum wallets inject the window.ethereum object. If it hasn't been
     // injected, we instruct the user to install MetaMask.
     if (window.ethereum === undefined) {
       return <NoWalletDetected />;
     }
+
 
     // The next thing we need to do, is to ask the user to connect their wallet.
     // When the wallet gets connected, we are going to save the users's address
@@ -91,7 +97,7 @@ export class Dapp extends React.Component {
 
     // If the token data or the user's balance hasn't loaded yet, we show
     // a loading component.
-    if (!this.state.tokenData || !this.state.balance) {
+    if (!this.state.tokenData || !this.state.balance || !this.state.timeshareMonths) {
       return <Loading />;
     }
 
@@ -165,9 +171,12 @@ export class Dapp extends React.Component {
           </div>
         </div>
 
-        <div className="row">
-          Testing!!, {this._nfTimeshare.address}
-        </div>
+        <IframeResizer
+          log
+          src='https://testnets.opensea.io/assets/timesharemonth?embed=true'
+          scrolling="yes"
+          style={{ width: '1px', minWidth: '100%', height: '1000px'}}
+        />
       </div>
     );
   }
@@ -400,6 +409,9 @@ export class Dapp extends React.Component {
     const timeshareMonthURL = "https://testnets-api.opensea.io/api/v1/assets?asset_contract_address=0x81559aC577b0d1219a8C801f0a58bA559707AefC&order_direction=desc&offset=0&limit=20";
     const response = await axios.get(timeshareMonthURL);
     console.log(response);
+    console.log(response.data.assets);
     //const response = await axios.get('');
+
+    this.setState({ timeshareMonths: response.data.assets});
   }
 }
