@@ -4,6 +4,7 @@ require("@nomiclabs/hardhat-waffle");
 // project. It imports a Hardhat task definition, that can be used for
 // testing the frontend.
 require("./tasks/faucet");
+require('@openzeppelin/hardhat-upgrades');
 
 const { alchemyApiKey, mnemonic } = require('./secrets.json');
 

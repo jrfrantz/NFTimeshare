@@ -1,3 +1,6 @@
+const { ethers, upgrades } = require("hardhat");
+
+
 // This is a script for deploying your contracts. You can adapt it to deploy
 // yours, or create new ones.
 async function main() {
@@ -19,34 +22,26 @@ async function main() {
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
+  // remove for full deployment
   const Token = await ethers.getContractFactory("Token");
+  //const token = await Token.deployProxy();
   const token = await Token.deploy();
   await token.deployed();
 
-
-  /*
-  const timeLibrary = await deploy("BokkyPooBahsDateTimeLibrary", {
-      from: <deployer>
-  });
-  */
-
   const NFTimeshare = await ethers.getContractFactory("NFTimeshare");
+  //const nftimeshare = await NFTimeshare.deployProxy();
   const nftimeshare = await NFTimeshare.deploy();
-  /*
-  const example = await deploy("Example", {
-    from: <deployer>
-    args: ["example string argument for the 'Example' contract constructor"],
-    libraries: {
-        ExampleLibrary: exampleLibrary.address
-    }
-});
-  */
   await nftimeshare.deployed();
 
   const NFTimeshareMonth = await ethers.getContractFactory("NFTimeshareMonth");
+  //const nftimesharemonth = await NFTimeshareMonth.deployProxy();
   const nftimesharemonth = await NFTimeshareMonth.deploy();
   await nftimesharemonth.deployed();
 
+  // remove for full deployment
+  const TestNFT = await ethers.getContractFactory("TestNFT");
+  const tNFT    = await tNFT.deploy();
+  await tNFT.deployed();
   console.log("Token address:", token.address);
   console.log("NFTimeshare addr:", nftimeshare.address);
   console.log("NFTimeshareMonth addr:", nftimesharemonth.address);
