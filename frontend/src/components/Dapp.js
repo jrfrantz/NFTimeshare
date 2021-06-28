@@ -6,6 +6,9 @@ import { ethers } from "ethers";
 // We import the contract's artifacts and address here, as we are going to be
 // using them with ethers
 import TokenArtifact from "../contracts/Token.json";
+import NFTimeshareArtifact from "../contracts/NFTimeshare.json";
+import NFTimeshareMonthArtifact from "../contracts/NFTimeshareMonth.json";
+import TestNFTArtifact from "../contracts/TestNFT.json";
 import contractAddress from "../contracts/contract-address.json";
 
 // All the logic of this dapp is contained in the Dapp component.
@@ -19,10 +22,13 @@ import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
 import { NoTokensMessage } from "./NoTokensMessage";
 
+const axios = require('axios');
+
 // This is the Hardhat Network id, you might change it in the hardhat.config.js
 // Here's a list of network ids https://docs.metamask.io/guide/ethereum-provider.html#properties
 // to use when deploying to other networks.
 const HARDHAT_NETWORK_ID = '31337';
+const RINKEBY_NETWORK_ID = '4';
 
 // This is an error code that indicates that the user canceled a transaction
 const ERROR_CODE_TX_REJECTED_BY_USER = 4001;
@@ -59,6 +65,7 @@ export class Dapp extends React.Component {
   }
 
   render() {
+    console.log("hello?");
     // Ethereum wallets inject the window.ethereum object. If it hasn't been
     // injected, we instruct the user to install MetaMask.
     if (window.ethereum === undefined) {
@@ -157,6 +164,10 @@ export class Dapp extends React.Component {
             )}
           </div>
         </div>
+
+        <div className="row">
+          Testing!!, {this._nfTimeshare.address}
+        </div>
       </div>
     );
   }
@@ -221,6 +232,8 @@ export class Dapp extends React.Component {
     this._intializeEthers();
     this._getTokenData();
     this._startPollingData();
+    this._getAllTimeshareMonths();
+    console.log("howdy");
   }
 
   async _intializeEthers() {
@@ -234,6 +247,21 @@ export class Dapp extends React.Component {
       TokenArtifact.abi,
       this._provider.getSigner(0)
     );
+    this._nfTimeshare = new ethers.Contract(
+      contractAddress.NFTimeshare,
+      NFTimeshareArtifact.abi,
+      this._provider.getSigner(0)
+    );
+    this._nfTimeshareMonth = new ethers.Contract(
+      contractAddress.NFTimeshareMonth,
+      NFTimeshareMonthArtifact.abi,
+      this._provider.getSigner(0)
+    );
+    this._testNFT = new ethers.Contract(
+      contractAddress.TestNFT,
+      TestNFTArtifact.abi,
+      this._provider.getSigner(0)
+    )
   }
 
   // The next to methods are needed to start and stop polling data. While
@@ -365,5 +393,13 @@ export class Dapp extends React.Component {
     });
 
     return false;
+  }
+
+  // fetch data from opensea
+  async _getAllTimeshareMonths() {
+    const timeshareMonthURL = "https://testnets-api.opensea.io/api/v1/assets?asset_contract_address=0x81559aC577b0d1219a8C801f0a58bA559707AefC&order_direction=desc&offset=0&limit=20";
+    const response = await axios.get(timeshareMonthURL);
+    console.log(response);
+    //const response = await axios.get('');
   }
 }

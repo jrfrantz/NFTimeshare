@@ -40,38 +40,64 @@ async function main() {
 
   // remove for full deployment
   const TestNFT = await ethers.getContractFactory("TestNFT");
-  const tNFT    = await tNFT.deploy();
+  const tNFT    = await TestNFT.deploy();
   await tNFT.deployed();
+
   console.log("Token address:", token.address);
   console.log("NFTimeshare addr:", nftimeshare.address);
   console.log("NFTimeshareMonth addr:", nftimesharemonth.address);
+  console.log("TestNFT addr: ", tNFT.address);
 
   // set links between Timeshare and TimeshareMonths
   await nftimeshare.setNFTimeshareMonthAddress(nftimesharemonth.address);
   await nftimesharemonth.setNFTimeshareAddress(nftimeshare.address);
 
   // We also save the contract's artifacts and address in the frontend directory
-  saveFrontendFiles(token);
+  saveFrontendFiles([token, nftimeshare, nftimesharemonth, tNFT]);
 }
 
-function saveFrontendFiles(token) {
+function saveFrontendFiles(tokens) {
   const fs = require("fs");
   const contractsDir = __dirname + "/../frontend/src/contracts";
+  // let token, nftimeshare, nftimesharemonth, tNFT, rest;
+  const [token, nftimeshare, nftimesharemonth, tNFT, ...rest] = tokens;
 
   if (!fs.existsSync(contractsDir)) {
     fs.mkdirSync(contractsDir);
   }
 
+  const contractsJSON = {
+    Token: token.address,
+    NFTimeshare: nftimeshare.address,
+    NFTimeshareMonth: nftimesharemonth.address,
+    TestNFT: tNFT.address
+  }
+
   fs.writeFileSync(
     contractsDir + "/contract-address.json",
-    JSON.stringify({ Token: token.address }, undefined, 2)
+    JSON.stringify(contractsJSON, undefined, 2)
   );
 
   const TokenArtifact = artifacts.readArtifactSync("Token");
+  const NFTimeshareArtifact = artifacts.readArtifactSync("NFTimeshare");
+  const NFTimeshareMonthArtifact = artifacts.readArtifactSync("NFTimeshareMonth");
+  const TestNFTArtifact = artifacts.readArtifactSync("TestNFT");
 
   fs.writeFileSync(
     contractsDir + "/Token.json",
     JSON.stringify(TokenArtifact, null, 2)
+  );
+  fs.writeFileSync(
+    contractsDir + "/NFTimeshare.json",
+    JSON.stringify(NFTimeshareArtifact, null, 2)
+  );
+  fs.writeFileSync(
+    contractsDir + "/NFTimeshareMonth.json",
+    JSON.stringify(NFTimeshareMonthArtifact, null, 2)
+  );
+  fs.writeFileSync(
+    contractsDir + "/TestNFT.json",
+    JSON.stringify(TestNFTArtifact, null, 2)
   );
 }
 
