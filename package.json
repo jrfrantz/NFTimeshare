@@ -39,5 +39,8 @@
     "hardhat": "^2.0.4",
     "husky": "^4.2.5",
     "concurrently": "^4.0.1"
+  },
+  "engines": {
+    "node": "^12.22.1"
   }
 }
