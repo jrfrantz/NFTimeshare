@@ -9,7 +9,7 @@
     "test": "hardhat test",
     "client": "cd frontend && npm run start",
     "server": "nodemon metadata-api-nodejs/index.js",
-    
+    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
   },
   "repository": {
     "type": "git",
@@ -37,6 +37,7 @@
     "ethereum-waffle": "^3.1.1",
     "ethers": "^5.4.0",
     "hardhat": "^2.0.4",
-    "husky": "^4.2.5"
+    "husky": "^4.2.5",
+    "concurrently": "^4.0.1"
   }
 }

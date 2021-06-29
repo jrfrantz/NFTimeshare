@@ -26,13 +26,13 @@ app.use(express.static(path.join(__dirname, 'public')))
 setupContracts();
 
 
-
-app.get('/', async function(req, res) {
+app.use('/', express.static('../frontend/build'));
+/*app.get('/', async function(req, res) {
   //res.send('Get ready for OpenSea!');
-  var l = await provider.getBlockNumber();
-  var y = await nftimesharemonth.totalSupply();
-  res.send(y.toString());
-})
+  //var l = await provider.getBlockNumber();
+  //var y = await nftimesharemonth.totalSupply();
+  //res.send(y.toString());
+})*/
 
 
 // need one for timeshare and one for timesharemonth
