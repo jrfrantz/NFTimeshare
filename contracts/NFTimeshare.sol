@@ -96,11 +96,16 @@ contract NFTimeshare is ERC721Enumerable, ERC721Holder, Ownable {
     function getTokenIdForUnderlyingNFT(address addr, uint256 externalTokenId) public view returns (uint256) {
       return _tokenIdForUnderlying[addr][externalTokenId];
     }
-    function tokenURI(uint256 tokenId) public view virtual override needsTimeshareMonths returns (string memory) {
+
+    function _baseURI() internal view virtual override returns (string memory) {
+
+    }
+    function underlyingTokenURI(uint256 tokenId) public view virtual needsTimeshareMonths returns (string memory) {
         UnderlyingNFT memory underlying = _wrappedNFTs[tokenId];
         string memory retval = IERC721Metadata(underlying._contractAddr).tokenURI(underlying._tokenId);
         return retval;
     }
+
     modifier needsTimeshareMonths {
         require(address(_NFTimeshareMonths) != address(0x0), "NFTimeshare contract address hasn't been set up");
         _;

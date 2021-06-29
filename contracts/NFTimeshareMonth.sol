@@ -35,16 +35,14 @@ contract NFTimeshareMonth is ERC721Enumerable, Ownable {
         assert(false); // couldn't find month for tokenId
     }
 
-    // just pass the URI for the wrapped asset
-    function tokenURI(uint256 tokenId) public view virtual override returns (string memory) {
-        require(address(_NFTimeshare) != address(0x0), "TimeshareMonth tokenURI: Timeshare contract hasn't been set");
-        require (_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
+    function underlyingTokenURI(uint256 tokenId) public view virtual returns (string memory) {
+      require(address(_NFTimeshare) != address(0x0), "TimeshareMonth tokenURI: Timeshare contract hasn't been set");
+      require (_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");
 
-        uint256 timeshareTokenId = _timeshareForMonth[tokenId];
-        assert(timeshareTokenId > 0); // if token _exists() we should have a mapping for it.
-        return _NFTimeshare.tokenURI(timeshareTokenId);
+      uint256 timeshareTokenId = _timeshareForMonth[tokenId];
+      assert(timeshareTokenId > 0); // if token _exists() we should have a mapping for it.
+      return _NFTimeshare.underlyingTokenURI(timeshareTokenId);
     }
-
     // assumes the NFT is already wrapped by the NFTimeshare contract
     function makeTimesharesFor(uint256 timeshareTokenId, address to) external onlyTimeshare {
         // require msg.sender owns the times
