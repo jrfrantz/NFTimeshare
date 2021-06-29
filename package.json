@@ -1,12 +1,15 @@
 {
-  "name": "hardhat-hackathon-boilerplate",
+  "name": "NFTimeshares Project",
   "version": "1.0.0",
-  "description": "A boilerplate repository to get you started with Hardhat and Ethereum development",
+  "description": "Make a timeshare of an NFT",
   "directories": {
     "test": "test"
   },
   "scripts": {
-    "test": "hardhat test"
+    "test": "hardhat test",
+    "client": "cd frontend && npm run start",
+    "server": "nodemon metadata-api-nodejs/index.js",
+    
   },
   "repository": {
     "type": "git",
@@ -15,7 +18,9 @@
   "keywords": [
     "hardhat",
     "ethereum",
-    "hackathon"
+    "react",
+    "express",
+    "timeshare"
   ],
   "author": "Nomic Labs",
   "license": "MIT",

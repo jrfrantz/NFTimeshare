@@ -1,0 +1,6 @@
+{
+  "name": "Metadata API for NFTimeshares",
+  "description": "Metadata API for NFTimeshares and NFTimeshareMonths",
+  "repository": "https://github.com/jrfrantz/NFTimeshares",
+  "keywords": ["nft", "crypto", "opensea", "erc721", "erc1155", "node", "express", "static", "timeshares"]
+}
