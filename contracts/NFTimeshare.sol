@@ -98,7 +98,10 @@ contract NFTimeshare is ERC721Enumerable, ERC721Holder, Ownable {
     }
 
     function _baseURI() internal view virtual override returns (string memory) {
-
+      return "www.nftimeshares.fun/timeshare/";
+    }
+    function _exists(uint256 tokenId) internal view virtual override returns (bool) {
+      return (_wrappedNFTs[tokenId]._contractAddr != address(0));
     }
     function underlyingTokenURI(uint256 tokenId) public view virtual needsTimeshareMonths returns (string memory) {
         UnderlyingNFT memory underlying = _wrappedNFTs[tokenId];

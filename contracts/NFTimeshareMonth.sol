@@ -35,6 +35,9 @@ contract NFTimeshareMonth is ERC721Enumerable, Ownable {
         assert(false); // couldn't find month for tokenId
     }
 
+    function _baseURI() internal view virtual override returns (string memory) {
+      return "www.nftimeshares.fun/timesharemonth/";
+    }
     function underlyingTokenURI(uint256 tokenId) public view virtual returns (string memory) {
       require(address(_NFTimeshare) != address(0x0), "TimeshareMonth tokenURI: Timeshare contract hasn't been set");
       require (_exists(tokenId), "ERC721Metadata: URI query for nonexistent token");

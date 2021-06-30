@@ -155,11 +155,24 @@ describe("NFTimeshare and NFTimeshareMonths contract", function () {
       var timeshareURI = await tTimeshare.tokenURI(timeshareTokenId);
       var timeshareMonthURI = await tTimeshareMonth.tokenURI(monthTokenIds[0]);
       var wrappedURI = await tExternalNFT.tokenURI(externalTokenId);
-      expect(timeshareURI).to.equal(timeshareMonthURI);
+      const baseURL = "www.nftimeshares.fun/";
+      expect(timeshareURI)
+      .to.equal(baseURL + "timeshare/" + timeshareTokenId.toString());
+      expect(timeshareMonthURI)
+      .to.equal(baseURL + "timesharemonth/" + monthTokenIds[0]);
       expect(timeshareURI).to.not.equal("");
-      expect(wrappedURI).to.equal(timeshareURI);
+      expect(wrappedURI).to.not.equal(timeshareURI);
     });
+    it("Should preserve wrapped URIs from parent assets", async function() {
+      var timeshareWrappedURI = await tTimeshare.underlyingTokenURI(timeshareTokenId);
+      var timeshareMonthWrappedURI = await tTimeshareMonth.underlyingTokenURI(monthTokenIds[0]);
+      var wrappedURI = await tExternalNFT.tokenURI(externalTokenId);
 
+      expect(timeshareWrappedURI).to.equal(wrappedURI);
+      expect(timeshareMonthWrappedURI).to.equal(wrappedURI);
+      expect(timeshareMonthWrappedURI)
+      .to.equal(await tTimeshareMonth.underlyingTokenURI(monthTokenIds[1]));
+    });
     it("Shouldn't allow any transfers of wrapped asset", async function() {
       expect(tTimeshare.deposit(
         tExternalNFT.address,

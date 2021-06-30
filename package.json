@@ -32,14 +32,14 @@
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.0",
-    "@openzeppelin/hardhat-upgrades": "^1.8.2",
+    "@openzeppelin/hardhat-upgrades": "^1.9.0",
     "@openzeppelin/test-helpers": "^0.5.11",
     "chai": "^4.2.0",
+    "concurrently": "^4.0.1",
     "ethereum-waffle": "^3.1.1",
     "ethers": "^5.4.0",
     "hardhat": "^2.0.4",
-    "husky": "^4.2.5",
-    "concurrently": "^4.0.1"
+    "husky": "^4.2.5"
   },
   "engines": {
     "node": "^12.22.1"
