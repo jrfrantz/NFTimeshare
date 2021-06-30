@@ -21,19 +21,24 @@ const app = express()
   .set('view engine', 'ejs')
 
 // Static public files
-app.use(express.static(path.join(__dirname, 'public')))
+//app.use(express.static(path.join(__dirname, 'public')))
 
 setupContracts();
 
 
-app.use('/', express.static('../frontend/build'));
+//app.use('/', express.static('../frontend/build'));
 /*app.get('/', async function(req, res) {
   //res.send('Get ready for OpenSea!');
   //var l = await provider.getBlockNumber();
   //var y = await nftimesharemonth.totalSupply();
   //res.send(y.toString());
 })*/
-
+/* app.get("/", async function(req, res) {
+  console.log("asked to get root");
+  res.sendFile(path.join(__dirname, "..", "frontend/build"));
+})*/
+app.use(express.static(path.join(__dirname, "..", "frontend/build")));
+app.use(express.static("../frontend/public"));
 
 // need one for timeshare and one for timesharemonth
 app.get('/timesharemonth/:token_id', async function(req, res) {
@@ -57,15 +62,18 @@ app.get('/timesharemonth/:token_id', async function(req, res) {
   res.json(underlyingMetadata);
 })
 
-app.get('/timeshare/:token_id'), async function(req, res) {
+app.get('/timeshare/:token_id', async function(req, res) {
   const tokenId = parseInt(req.params.token_id);
+  res.json({"Hi": tokenId});
+  console.log("Testo");
+  return;
   var underlyingTokenURI = await ntfimeshare.underlyingTokenURI(tokenId);
   var underlyingMetadata = (await axios.get(underlyingTokenURI)).json();
 
   // process JSON here
 
   res.json(underlyingMetadata);
-}
+})
 
 app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));

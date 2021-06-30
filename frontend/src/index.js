@@ -19,17 +19,7 @@ var path = require('path');
 
 ReactDOM.render(
   <React.StrictMode>
-  <Router>
-    <Switch>
-      <Route exact path="/">
-        <Dapp />
-      </Route>
-      <Route exact path="/tokenURI/:tokenId">
-        <TokenURI />
-      </Route>
-    </Switch>
-  </Router>
+    <Dapp />
   </React.StrictMode>,
-
   document.getElementById("root")
 );

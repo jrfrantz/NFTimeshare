@@ -7,9 +7,10 @@
   },
   "scripts": {
     "test": "hardhat test",
+    "build-client": "cd frontend && npm run build",
     "client": "cd frontend && npm run start",
-    "server": "nodemon metadata-api-nodejs/index.js",
-    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\""
+    "server": "cd metadata-api-nodejs && npm run start",
+    "dev": "concurrently --kill-others-on-fail \"npm run build-client\" \"npm run server\""
   },
   "repository": {
     "type": "git",
