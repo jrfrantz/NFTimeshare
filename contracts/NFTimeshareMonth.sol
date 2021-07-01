@@ -1,22 +1,26 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.7.0 <0.9.0;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "hardhat/console.sol";
 import "./NFTimeshare.sol";
 
-contract NFTimeshareMonth is ERC721Enumerable, Ownable {
-    using Counters for Counters.Counter;
+contract NFTimeshareMonth is Initializable, ERC721EnumerableUpgradeable, OwnableUpgradeable {
+    using CountersUpgradeable for CountersUpgradeable.Counter;
 
-    Counters.Counter private _tokenIds;
+    CountersUpgradeable.Counter private _tokenIds;
     NFTimeshare private _NFTimeshare;
     mapping (uint256 => uint256) private _timeshareForMonth;
     mapping (uint256 => uint256[12]) private _monthsForTimeshare;
 
-    constructor() ERC721("TimeshareMonth","TIME") {}
+    function initialize() public initializer {
+      __ERC721_init("TimeshareMonth", "Time");
+      __ERC721Enumerable_init();
+      __Ownable_init();
+    }
 
     // return the int representation of the month of this token, 0-indexed
     // 0 = January; 11 = December

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.7.0 <0.9.0;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
-import "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/IERC721ReceiverUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/utils/ERC721HolderUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "hardhat/console.sol";
 import "./NFTimeshareMonth.sol";
 import "./utils/BokkyPooBahsDateTimeLibrary.sol";
@@ -15,10 +15,20 @@ import "./utils/BokkyPooBahsDateTimeLibrary.sol";
 // TODO: make an interface for contracts
 // TODO: make upgradeable through openzeppelin
 // TODO: emit some Events
-contract NFTimeshare is ERC721Enumerable, ERC721Holder, Ownable {
-    using Counters for Counters.Counter;
+contract NFTimeshare is Initializable, ERC721EnumerableUpgradeable, ERC721HolderUpgradeable, OwnableUpgradeable {
+    using CountersUpgradeable for CountersUpgradeable.Counter;
     using BokkyPooBahsDateTimeLibrary for uint256;
 
+    CountersUpgradeable.Counter private _tokenIds;
+    NFTimeshareMonth private _NFTimeshareMonths;
+
+    mapping (address => mapping (uint256 => uint256)) private _tokenIdForUnderlying;
+    mapping (uint256 => UnderlyingNFT)                private _wrappedNFTs;
+
+    struct UnderlyingNFT {
+        address _contractAddr;
+        uint256 _tokenId;
+    }
 
     event Deposit(
       address indexed holder,
@@ -36,19 +46,16 @@ contract NFTimeshare is ERC721Enumerable, ERC721Holder, Ownable {
       uint256 timeshareTokenId
     );
 
-    Counters.Counter private _tokenIds;
-    NFTimeshareMonth private _NFTimeshareMonths;
 
-    mapping (address => mapping (uint256 => uint256)) private _tokenIdForUnderlying;
-    mapping (uint256 => UnderlyingNFT)                private _wrappedNFTs;
 
-    struct UnderlyingNFT {
-        address _contractAddr;
-        uint256 _tokenId;
+
+    //constructor() ERC721("Timeshare", "TSBO") {}
+    function initialize() public initializer {
+      __ERC721_init("Timeshare", "SHARE");
+      __ERC721Enumerable_init();
+      __ERC721Holder_init();
+      __Ownable_init();
     }
-
-
-    constructor() ERC721("Timeshare", "TSBO") {}
 
     // given an an NFT (contract + tokenId), wrap it and mint it into timeshares.
     // this contract must be approved to operate it. _to must be able to receive erc721s.
@@ -60,7 +67,7 @@ contract NFTimeshare is ERC721Enumerable, ERC721Holder, Ownable {
         _wrappedNFTs[newTokenId] = UnderlyingNFT(_underlying, _underlyingTokenId);
 
         _NFTimeshareMonths.makeTimesharesFor(newTokenId, _to);
-        IERC721(_underlying).safeTransferFrom(_from, address(this), _underlyingTokenId);
+        IERC721Upgradeable(_underlying).safeTransferFrom(_from, address(this), _underlyingTokenId);
         emit Deposit(_from, msg.sender, _to, _underlying, _underlyingTokenId, newTokenId);
     }
 
@@ -75,7 +82,7 @@ contract NFTimeshare is ERC721Enumerable, ERC721Holder, Ownable {
         delete _wrappedNFTs[tokenId];
 
         _NFTimeshareMonths.burnTimeshareMonthsFor(msg.sender, tokenId);
-        IERC721(underlyingNFT._contractAddr).safeTransferFrom(address(this), _to, underlyingNFT._tokenId);
+        IERC721Upgradeable(underlyingNFT._contractAddr).safeTransferFrom(address(this), _to, underlyingNFT._tokenId);
         emit Redeem(msg.sender, _to, underlyingNFT._contractAddr, underlyingNFT._tokenId, tokenId);
 
     }
@@ -105,7 +112,7 @@ contract NFTimeshare is ERC721Enumerable, ERC721Holder, Ownable {
     }
     function underlyingTokenURI(uint256 tokenId) public view virtual needsTimeshareMonths returns (string memory) {
         UnderlyingNFT memory underlying = _wrappedNFTs[tokenId];
-        string memory retval = IERC721Metadata(underlying._contractAddr).tokenURI(underlying._tokenId);
+        string memory retval = IERC721MetadataUpgradeable(underlying._contractAddr).tokenURI(underlying._tokenId);
         return retval;
     }
 

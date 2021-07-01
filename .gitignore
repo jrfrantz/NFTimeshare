@@ -9,3 +9,6 @@ artifacts
 .secrets
 secrets
 secrets.json
+
+#OpenZeppelin
+.openzeppelin/unknown-*.json

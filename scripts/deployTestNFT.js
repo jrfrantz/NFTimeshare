@@ -1,4 +1,4 @@
-const { ethers, upgrades } = require("hardhat"); 
+const { ethers, upgrades } = require("hardhat");
 
 // This is a script for deploying your contracts. You can adapt it to deploy
 // yours, or create new ones.
@@ -22,7 +22,7 @@ async function main() {
   console.log("Account balance:", (await deployer.getBalance()).toString());
 
   const TestNFT = await ethers.getContractFactory("TestNFT");
-  const testNFT = await TestNFT.deployProxy();
+  const testNFT = await upgrades.deployProxy(TestNFT, []);
   await testNFT.deployed();
 
   console.log("Test NFT address is: ", testNFT.address);

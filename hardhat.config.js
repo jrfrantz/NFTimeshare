@@ -4,10 +4,14 @@ require("@nomiclabs/hardhat-waffle");
 // project. It imports a Hardhat task definition, that can be used for
 // testing the frontend.
 require("./tasks/faucet");
+require("@nomiclabs/hardhat-ethers");
 require('@openzeppelin/hardhat-upgrades');
 
 const { alchemyApiKey, mnemonic } = require('./secrets.json');
 
+/**
+ * @type import('hardhat/config').HardhatUserConfig
+ */
 module.exports = {
   solidity: {
     compilers: [

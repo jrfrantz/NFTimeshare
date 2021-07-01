@@ -24,23 +24,24 @@ async function main() {
 
   // remove for full deployment
   const Token = await ethers.getContractFactory("Token");
-  //const token = await Token.deployProxy();
-  const token = await Token.deploy();
+  //const token = await Token.deploy();
+  const token = await upgrades.deployProxy(Token, []);
   await token.deployed();
 
   const NFTimeshare = await ethers.getContractFactory("NFTimeshare");
-  //const nftimeshare = await NFTimeshare.deployProxy();
-  const nftimeshare = await NFTimeshare.deploy();
+  //const nftimeshare = await NFTimeshare.deploy();
+  const nftimeshare = await upgrades.deployProxy(NFTimeshare, []);
   await nftimeshare.deployed();
 
   const NFTimeshareMonth = await ethers.getContractFactory("NFTimeshareMonth");
-  //const nftimesharemonth = await NFTimeshareMonth.deployProxy();
-  const nftimesharemonth = await NFTimeshareMonth.deploy();
+  //const nftimesharemonth = await NFTimeshareMonth.deploy();
+  const nftimesharemonth = await upgrades.deployProxy(NFTimeshareMonth, []);
   await nftimesharemonth.deployed();
 
   // remove for full deployment
   const TestNFT = await ethers.getContractFactory("TestNFT");
-  const tNFT    = await TestNFT.deploy();
+  //const tNFT    = await TestNFT.deploy();
+  const tNFT    = await upgrades.deployProxy(TestNFT, []);
   await tNFT.deployed();
 
   console.log("Token address:", token.address);

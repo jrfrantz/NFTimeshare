@@ -6,6 +6,7 @@
 // We import Chai to use its asserting functions here.
 // TODO: delete all the Token.sol and Token.js files
 const { expect } = require("chai");
+const { ethers , upgrades } = require("hardhat");
 const {
   BN,           // Big Number support
   constants,    // Common constants, like the zero address and largest integers
@@ -13,6 +14,7 @@ const {
   expectRevert, // Assertions for transactions that should fail
   time
 } = require('@openzeppelin/test-helpers');
+
 
 const THIRTY_DAYS_IN_SECONDS = 30*24*60*60;
 
@@ -67,11 +69,16 @@ describe("NFTimeshare and NFTimeshareMonths contract", function () {
     // To deploy our contract, we just have to call Token.deploy() and await
     // for it to be deployed(), which happens onces its transaction has been
     // mined.
+    /*
     hhTimeshare      = await NFTimeshare.deploy();
     hhTimeshareMonth = await NFTimeshareMonth.deploy();
     hhTestNFT        = await TestNFT.deploy();
     bokkyPooBahsDateTimeLibrary = await BokkyPooBahsDateTimeLibrary.deploy();
-    //console.log(bokkyPooBahsDateTimeLibrary);
+    */
+    hhTimeshare      = await upgrades.deployProxy(NFTimeshare, []);
+    hhTimeshareMonth = await upgrades.deployProxy(NFTimeshareMonth, []);
+    hhTestNFT        = await upgrades.deployProxy(TestNFT, []);
+    bokkyPooBahsDateTimeLibrary = await upgrades.deployProxy(BokkyPooBahsDateTimeLibrary, []);
 
     await hhTimeshare.deployed();
     await hhTimeshareMonth.deployed();
