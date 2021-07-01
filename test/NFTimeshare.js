@@ -22,7 +22,6 @@ async function increaseTime(addlSeconds) {
 
   blockNum = await ethers.provider.getBlockNumber();
   lastBlock = await ethers.provider.getBlock(blockNum)
-
   await ethers.provider.send("evm_increaseTime", [addlSeconds]);
   await ethers.provider.send("evm_mine");
 
