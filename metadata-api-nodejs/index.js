@@ -64,14 +64,18 @@ app.get('/timesharemonth/:token_id', async function(req, res) {
 
 app.get('/timeshare/:token_id', async function(req, res) {
   const tokenId = parseInt(req.params.token_id);
-  res.json({"Hi": tokenId});
-  console.log("Testo");
-  return;
-  var underlyingTokenURI = await ntfimeshare.underlyingTokenURI(tokenId);
-  var underlyingMetadata = (await axios.get(underlyingTokenURI)).json();
+  const timeshareMonthIds  = await nftimesharemonth.getTimeshareMonths(tokenId);
+  const underlyingTokenURI = await ntfimeshare.underlyingTokenURI(tokenId);
+  var   underlyingMetadata = (await axios.get(underlyingTokenURI)).json();
 
   // process JSON here
-
+  if (!underlyingMetadata.attributes) {
+    underlyingMetadata.attributes = []
+  }
+  underlyingMetadata.attributes.push({
+    trait_type: "Ownership",
+    value     : "Timeshared"
+  })
   res.json(underlyingMetadata);
 })
 

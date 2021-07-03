@@ -48,6 +48,7 @@ async function main() {
   console.log("NFTimeshare addr:", nftimeshare.address);
   console.log("NFTimeshareMonth addr:", nftimesharemonth.address);
   console.log("TestNFT addr: ", tNFT.address);
+  console.log("parent directory is ", __dirname);
 
   // set links between Timeshare and TimeshareMonths
   await nftimeshare.setNFTimeshareMonthAddress(nftimesharemonth.address);

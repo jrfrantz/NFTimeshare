@@ -12,7 +12,7 @@ import TestNFTArtifact from "../contracts/TestNFT.json";
 import contractAddress from "../contracts/contract-address.json";
 
 import Container from "react-bootstrap/Container";
-import IframeResizer from 'iframe-resizer-react'
+//import IframeResizer from 'iframe-resizer-react'
 
 
 // All the logic of this dapp is contained in the Dapp component.
@@ -26,6 +26,7 @@ import { TransactionErrorMessage } from "./TransactionErrorMessage";
 import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
 import { NoTokensMessage } from "./NoTokensMessage";
 import { TimeshareMonths } from "./TimeshareMonths";
+import { AwardNFTButton } from "./AwardNFTButton";
 
 const axios = require('axios');
 
@@ -171,12 +172,12 @@ export class Dapp extends React.Component {
           </div>
         </div>
 
-        <IframeResizer
+        {/*<IframeResizer
           log
           src='https://testnets.opensea.io/assets/timesharemonth?embed=true'
           scrolling="yes"
           style={{ width: '1px', minWidth: '100%', height: '1000px'}}
-        />
+        />*/}
       </div>
     );
   }
@@ -251,6 +252,7 @@ export class Dapp extends React.Component {
 
     // When, we initialize the contract using that provider and the token's
     // artifact. You can do this same thing with your contracts.
+    console.log("Token contract thinks it's at ", contractAddress.Token);
     this._token = new ethers.Contract(
       contractAddress.Token,
       TokenArtifact.abi,
