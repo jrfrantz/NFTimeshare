@@ -9,7 +9,7 @@ const path = require('path')
 const { ethers } = require("ethers");
 const axios = require('axios');
 const PORT = process.env.PORT || 5000
-
+const { alchemyKeyOnly } = require('../secrets.json');
 const NFTimeshareArtifact      = require("./src/contracts/NFTimeshare.json");
 const NFTimeshareMonthArtifact = require("./src/contracts/NFTimeshareMonth.json");
 const contractAddress          = require("./src/contracts/contract-address.json");
@@ -45,36 +45,57 @@ app.get('/timesharemonth/:token_id', async function(req, res) {
   // 1/ get parent nft's tokenId for this timeshare
   // 2/ (contract, tokenId) = wrappedNFT (tokenId)
   // 3/ call and read URI of underlying
-  const tokenId = parseInt(req.params.token_id);
-  var underlyingTokenURI = await nftimesharemonth.underlyingTokenURI(tokenId);
-  var monthStr = monthName(await nftimesharemonth.month(tokenId));
-  var underlyingMetadata = (await axios.get(underlyingTokenURI)).json();
+  try {
+    const tokenId = parseInt(req.params.token_id);
+    console.log(tokenId);
+    var underlyingTokenURI = await nftimesharemonth.underlyingTokenURI(tokenId);
+    var monthStr = monthName(await nftimesharemonth.month(tokenId));
+    var parentId =           await nftimesharemonth.getParentTimeshare(tokenId);
+    var underlyingMetadata = await axios.get(underlyingTokenURI);
+    if (underlyingMetadata.status !== 200) {
+      res.send("Error in underlying NFT's metadata " + JSON.stringify(underlyingMetadata));
+      return;
+    }
+    underlyingMetadata = underlyingMetadata.data
+    if (!underlyingMetadata.attributes) {
+      underlyingMetadata.attributes = [];
+    }
+    underlyingMetadata.attributes.push({
+      trait_type: "Month",
+      value     : monthStr
+    });
+    underlyingMetadata.attributes.push({
+      trait_type: "Parent Timeshare TokenId",
+      value     : parentId.toString()
+    });
 
-
-  if (!underlyingMetadata.attributes) {
-    underlyingMetadata.attributes = [];
+    res.json(underlyingMetadata);
+  } catch (error) {
+    console.error(error);
+    res.send(error);
   }
-  underlyingMetadata.attributes.push({
-    trait_type: "Month",
-    value     : monthStr
-  });
-
-  res.json(underlyingMetadata);
-})
+});
 
 app.get('/timeshare/:token_id', async function(req, res) {
   const tokenId = parseInt(req.params.token_id);
   const timeshareMonthIds  = await nftimesharemonth.getTimeshareMonths(tokenId);
-  const underlyingTokenURI = await ntfimeshare.underlyingTokenURI(tokenId);
-  var   underlyingMetadata = (await axios.get(underlyingTokenURI)).json();
-
-  // process JSON here
+  const underlyingTokenURI = await nftimeshare.underlyingTokenURI(tokenId);
+  var   underlyingMetadata = await axios.get(underlyingTokenURI);
+  if (underlyingMetadata.status !== 200) {
+    res.send("Error in underlying NFT's metadata " + JSON.stringify(underlyingMetadata));
+    return;
+  }
+  underlyingMetadata = underlyingMetadata.data;
   if (!underlyingMetadata.attributes) {
     underlyingMetadata.attributes = []
   }
   underlyingMetadata.attributes.push({
     trait_type: "Ownership",
     value     : "Timeshared"
+  })
+  underlyingMetadata.attributes.push({
+    trait_type: "Timeshare Months",
+    value      : timeshareMonthIds.map(id => {return id.toString()}).join(', ')
   })
   res.json(underlyingMetadata);
 })
@@ -91,15 +112,15 @@ function monthName(month) {
 }
 
 async function setupContracts() {
-  provider = new ethers.providers.JsonRpcProvider();
+  provider = new ethers.providers.AlchemyProvider("rinkeby", alchemy=alchemyKeyOnly);
   nftimeshare = new ethers.Contract(
     contractAddress.NFTimeshare,
     NFTimeshareArtifact.abi,
-    provider.getSigner()
+    provider
   );
   nftimesharemonth = new ethers.Contract(
     contractAddress.NFTimeshareMonth,
     NFTimeshareMonthArtifact.abi,
-    provider.getSigner()
+    provider
   );
 }
