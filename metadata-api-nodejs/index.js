@@ -9,7 +9,7 @@ const path = require('path')
 const { ethers } = require("ethers");
 const axios = require('axios');
 const PORT = process.env.PORT || 5000
-const { alchemyKeyOnly } = require('../secrets.json');
+const alchemyKeyOnly = process.env.ALCHEMY_KEY || require('../secrets.json').alchemyKeyOnly;
 const NFTimeshareArtifact      = require("./src/contracts/NFTimeshare.json");
 const NFTimeshareMonthArtifact = require("./src/contracts/NFTimeshareMonth.json");
 const contractAddress          = require("./src/contracts/contract-address.json");
@@ -24,7 +24,6 @@ const app = express()
 //app.use(express.static(path.join(__dirname, 'public')))
 
 setupContracts();
-
 
 //app.use('/', express.static('../frontend/build'));
 /*app.get('/', async function(req, res) {

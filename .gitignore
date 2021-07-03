@@ -12,3 +12,5 @@ secrets.json
 
 #OpenZeppelin
 .openzeppelin/unknown-*.json
+
+.env
