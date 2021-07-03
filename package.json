@@ -10,8 +10,8 @@
     "build-client": "cd frontend && npm run build",
     "client": "cd frontend && npm run start",
     "server": "cd metadata-api-nodejs && npm run start",
-    "server-prod": "node ./metadata-api-nodejs/index.js",
-    "dev": "concurrently --kill-others-on-fail \"npm run build-client\" \"npm run server\""
+    "server-prod": "cd metadata-api-nodejs && npm run start-prod",
+    "prod": "concurrently --kill-others-on-fail \"npm run build-client\" \"npm run server-prod\""
   },
   "repository": {
     "type": "git",
