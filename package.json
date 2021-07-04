@@ -7,7 +7,7 @@
   },
   "scripts": {
     "test": "hardhat test",
-    "build-client": "cd frontend && npm run build",
+    "build-client": "cd dapp && npm run build",
     "client": "cd dapp && npm run start",
     "server": "cd metadata-api-nodejs && npm run start",
     "server-prod": "cd metadata-api-nodejs && npm run start-prod",

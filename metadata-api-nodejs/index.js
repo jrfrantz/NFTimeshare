@@ -115,6 +115,15 @@ app.get('/api/test', async function(req,res) {
   console.log("hit /api/test backend", req);
   res.send("nice");
 })
+
+app.get('/api/ownednfts/:owner/:pagination_token?', async function (req, res) {
+  const ownerAddr = parseInt(req.params.owner);
+});
+
+app.get('/api/ownedtimesharemonths/:owner', async function (req, res) {
+
+});
+
 app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
 })
