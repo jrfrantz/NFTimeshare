@@ -56,9 +56,17 @@ app.get('/timesharemonth/:token_id', async function(req, res) {
       return;
     }
     underlyingMetadata = underlyingMetadata.data
+
     if (!underlyingMetadata.attributes) {
       underlyingMetadata.attributes = [];
     }
+    if (!underlyingMetadata.name) {
+      underlyingMetadata.name = "";
+    }
+    if (!underlyingMetadata.description) {
+      underlyingMetadata.description = "";
+    }
+
     underlyingMetadata.attributes.push({
       trait_type: "Month",
       value     : monthStr
@@ -67,6 +75,10 @@ app.get('/timesharemonth/:token_id', async function(req, res) {
       trait_type: "Parent Timeshare TokenId",
       value     : parentId.toString()
     });
+    underlyingMetadata.name = underlyingMetadata.name + " -- " + monthStr.toUpperCase();
+    underlyingMetadata.description = underlyingMetadata.description +
+        "  This NFT represents ownership for the month of " + monthStr + ". "
+        + "Learn more at www.nftimeshares.fun";
 
     res.json(underlyingMetadata);
   } catch (error) {
