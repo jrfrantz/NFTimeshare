@@ -55,10 +55,8 @@ async function main() {
   await nftimesharemonth.setNFTimeshareAddress(nftimeshare.address);
 
   // We also save the contract's artifacts and address in the frontend directory
-  const frontendDir = "/../frontend/src/contracts";
   const metadataDir = "/../metadata-api-nodejs/src/contracts";
   const dappDir     = "/../dapp/src/contracts";
-  saveFrontendFiles([token, nftimeshare, nftimesharemonth, tNFT], frontendDir);
   saveFrontendFiles([token, nftimeshare, nftimesharemonth, tNFT], metadataDir);
   saveFrontendFiles([token, nftimeshare, nftimesharemonth, tNFT], dappDir);
 }
