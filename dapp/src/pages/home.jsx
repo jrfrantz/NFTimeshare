@@ -27,6 +27,12 @@ const Home = () => {
               + contractAddress.NFTimeshareMonth.toLowerCase()
               + '&order_direction=desc&offset=0&limit=20';
     axios.get(timesharesURL).then(function (response) {
+      if (response.status !== 2000) {
+        console.log('error from opensea');
+        return;
+      }
+      var assets = response.data.assets;
+
       setPublicTimeshares({'nfts' : [...response.data.assets]})
     });
   }, []);

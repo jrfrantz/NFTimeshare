@@ -40,7 +40,7 @@ contract NFTimeshareMonth is Initializable, ERC721EnumerableUpgradeable, Ownable
     }
 
     function _baseURI() internal view virtual override returns (string memory) {
-      return "www.nftimeshares.fun/timesharemonth/";
+      return "http://www.nftimeshares.fun/timesharemonth/";
     }
     function underlyingTokenURI(uint256 tokenId) public view virtual returns (string memory) {
       require(address(_NFTimeshare) != address(0x0), "TimeshareMonth tokenURI: Timeshare contract hasn't been set");

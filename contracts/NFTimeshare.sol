@@ -105,7 +105,7 @@ contract NFTimeshare is Initializable, ERC721EnumerableUpgradeable, ERC721Holder
     }
 
     function _baseURI() internal view virtual override returns (string memory) {
-      return "www.nftimeshares.fun/timeshare/";
+      return "http://www.nftimeshares.fun/timeshare/";
     }
     function _exists(uint256 tokenId) internal view virtual override returns (bool) {
       return (_wrappedNFTs[tokenId]._contractAddr != address(0));
