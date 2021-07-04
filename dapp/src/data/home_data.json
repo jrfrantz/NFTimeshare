@@ -1,0 +1,19 @@
+{
+    "Header": {
+        "title": "Time share your NFT",
+        "paragraph": "Own an entire NFT -- for a month each year."
+    },
+    "Pitch": [{
+            "icon": "fa fa-calendar",
+            "text": "Any NFT can be converted into 12 timeshare NFTs -- one for each month."
+        },
+        {
+            "icon": "fa fa-exchange",
+            "text": "Timeshares can be bought, sold, and traded like any other NFTs."
+        },
+        {
+            "icon": "fa fa-bitcoin",
+            "text": "You can always exchange back all 12 months to get your original NFT."
+        }
+    ]
+}
