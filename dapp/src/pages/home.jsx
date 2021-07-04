@@ -57,18 +57,6 @@ const Home = () => {
     })
   }, [])
 
-  useEffect(() =>  {
-    async function fetchData() {
-      if (testNFT && Object.keys(testNFT).length == 0) {
-        console.log("null is ", testNFT, Object.keys(testNFT).length);
-        return;
-      }
-      var vSupply = await testNFT.balanceOf(address);
-      setViewerSupply(vSupply.toString());
-    }
-    fetchData();
-  }, [testNFT]);
-
 
   const connectWallet = async () => {
     const [selectedAddress] = await window.ethereum.enable();
