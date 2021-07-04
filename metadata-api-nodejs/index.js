@@ -36,8 +36,10 @@ setupContracts();
   console.log("asked to get root");
   res.sendFile(path.join(__dirname, "..", "frontend/build"));
 })*/
-app.use(express.static(path.join(__dirname, "..", "frontend/build")));
-app.use(express.static("../frontend/public"));
+//app.use(express.static(path.join(__dirname, "..", "frontend/build")));
+//app.use(express.static("../frontend/public"));
+app.use(express.static(path.join(__dirname, "..", "dapp/build")));
+app.use(express.static("../dapp/public"));
 
 // need one for timeshare and one for timesharemonth
 app.get('/timesharemonth/:token_id', async function(req, res) {
