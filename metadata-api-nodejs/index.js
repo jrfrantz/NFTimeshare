@@ -114,7 +114,7 @@ app.get('/timeshare/:token_id', async function(req, res) {
 })
 
 app.get('/api/test', async function(req,res) {
-  console.log("hit /api/test backend", req);
+  console.log("hit /api/test backend");
   res.send("nice");
 })
 

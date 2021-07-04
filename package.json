@@ -54,6 +54,7 @@
     "ejs": "^2.6.1",
     "ethers": "^5.4.0",
     "express": "^4.16.4",
-    "ethers": "^5.4.0"
+    "ethers": "^5.4.0",
+    "concurrently": "^4.0.1"
   }
 }
