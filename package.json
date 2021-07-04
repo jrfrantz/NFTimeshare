@@ -55,6 +55,7 @@
     "ethers": "^5.4.0",
     "express": "^4.16.4",
     "ethers": "^5.4.0",
+    "react-scripts": "^4.0.2",
     "concurrently": "^4.0.1"
   }
 }
