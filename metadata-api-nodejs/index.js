@@ -40,9 +40,9 @@ setupContracts();
 //app.use(express.static("../frontend/public"));
 app.use(express.static(path.join(__dirname, "..", "dapp/build")));
 app.use(express.static("../dapp/public"));
-/*app.get('/', function (req, res) {
+app.get('/*', function (req, res) {
   res.sendFile(path.join(__dirname, "../dapp/build", "index.html"));
-});*/
+});
 // need one for timeshare and one for timesharemonth
 app.get('/timesharemonth/:token_id', async function(req, res) {
   // 1/ get parent nft's tokenId for this timeshare
