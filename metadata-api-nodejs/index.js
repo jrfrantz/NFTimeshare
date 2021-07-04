@@ -111,6 +111,10 @@ app.get('/timeshare/:token_id', async function(req, res) {
   res.json(underlyingMetadata);
 })
 
+app.get('/api/test', async function(req,res) {
+  console.log("hit /api/test backend", req);
+  res.send("nice");
+})
 app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
 })

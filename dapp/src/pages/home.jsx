@@ -32,6 +32,14 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
+    console.log("testing backend");
+    axios.get('/api/test').then(function (response) {
+      console.log("hey!");
+      console.log("response");
+    })
+  }, []);
+
+  useEffect(() => {
     setLandingPageData(JsonData)
     if (!window.ethereum) {
       return;
