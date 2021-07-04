@@ -29,6 +29,7 @@ const Home = () => {
     axios.get(timesharesURL).then(function (response) {
       if (response.status !== 2000) {
         console.log('error from opensea');
+        console.log(response);
         return;
       }
       var assets = response.data.assets;
