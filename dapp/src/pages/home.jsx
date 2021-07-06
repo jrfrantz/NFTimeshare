@@ -9,6 +9,7 @@ import SmoothScroll from 'smooth-scroll'
 import contractAddress from "../contracts/contract-address.json"
 import TestNFTArtifact from "../contracts/TestNFT.json"
 import { NFTimesharesBrowsable } from "../components/nftimesharesbrowsable"
+import { Jumbotron, Container } from 'react-bootstrap';
 import axios from 'axios'
 export const scroll = new SmoothScroll('a[href*="#"]', {
   speed: 1000,
@@ -99,6 +100,12 @@ const Home = () => {
   }
   return (
     <div>
+      <Jumbotron fluid>
+        <Container>
+          <h1> Timeshares for NFTs </h1>
+          <p> bla h</p>
+        </Container>
+      </Jumbotron>
       <Header data={landingPageData.Header} />
       <Pitch data={landingPageData.Pitch} />
       <NFTimesharesBrowsable nfts={getNFTimeshares()} />
