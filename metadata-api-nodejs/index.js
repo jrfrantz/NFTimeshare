@@ -38,11 +38,8 @@ setupContracts();
 })*/
 //app.use(express.static(path.join(__dirname, "..", "frontend/build")));
 //app.use(express.static("../frontend/public"));
-app.use(express.static(path.join(__dirname, "..", "dapp/build")));
-app.use(express.static("../dapp/public"));
-app.get('/*', function (req, res) {
-  res.sendFile(path.join(__dirname, "../dapp/build", "index.html"));
-});
+//app.use(express.static(path.join(__dirname, "..", "dapp/build")));
+
 // need one for timeshare and one for timesharemonth
 app.get('/timesharemonth/:token_id', async function(req, res) {
   // 1/ get parent nft's tokenId for this timeshare
@@ -125,7 +122,58 @@ app.get('/api/ownednfts/:owner/:pagination_token?', async function (req, res) {
 });
 
 app.get('/api/ownedtimesharemonths/:owner', async function (req, res) {
+  const ownerAddr = req.params.owner;
+  console.log("Backend with " + ownerAddr);
+  if (!ownerAddr) {
+    res.send("Error: no owner specified in request to /ownedtimesharemonths api");
+  }
+  var balance = await nftimesharemonth.balanceOf(ownerAddr);
+  var tokens = [];
+  for (let i = 0 ; i < Math.min(balance, 20); i++ ) {
+    var token = await nftimesharemonth.tokenOfOwnerByIndex(ownerAddr, i);
+    console.log(token);
+    tokens.push(token);
+  }
+  res.json({tokens});
+});
 
+app.get('/api/alltimesharemonths', async function (req, res) {
+  try {
+    var supply = await nftimesharemonth.totalSupply();
+    var tokens = [];
+    for (let i = 0; i < Math.min(supply, 25); i++) {
+      var token = await nftimesharemonth.tokenByIndex(i);
+      console.log(token);
+      var month = await nftimesharemonth.month(token.toString());
+      console.log(month);
+      var url   = await nftimesharemonth.tokenURI(token.toString());
+      console.log(url);
+      var metadata = await axios.get(urlify(url));
+      console.log(metadata);
+      var media;
+      var name;
+      if (metadata.status == 200 && metadata.data) {
+        media = metadata.data.image || metadata.data.image_data || metadata.animation_url || metadata.youtube_url;
+        name = metadata.data.name;
+      }
+      tokens.push([{
+        id: token.toString(),
+        month: month.toString(),
+        media: media.toString(),
+        name: name.toString()
+      }]);
+    }
+    res.json(tokens);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+
+app.use(express.static("../dapp/public"));
+app.get('/*', function (req, res) {
+  //res.sendFile(path.join(__dirname, "../dapp/build", "index.html"));
+  res.sendFile(path.join(__dirname, "../dapp/public", "index.html"));
 });
 
 app.listen(app.get('port'), function() {
@@ -139,8 +187,13 @@ function monthName(month) {
   return monthNames[month]
 }
 
+function urlify(url) {
+  //TODO check if it's ipfs:// vs http[s]://
+  return url;
+}
+
 async function setupContracts() {
-  provider = new ethers.providers.AlchemyProvider("rinkeby", alchemy=alchemyKeyOnly);
+  provider = new ethers.providers.AlchemyProvider("rinkeby", alchemyKeyOnly);
   nftimeshare = new ethers.Contract(
     contractAddress.NFTimeshare,
     NFTimeshareArtifact.abi,

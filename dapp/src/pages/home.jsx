@@ -39,12 +39,25 @@ const Home = () => {
   }, []);
 
   useEffect(() => {
+    if (!address) {
+      return
+    }
+    axios.get('/api/ownedtimesharemonths' + address).then(function (response) {
+      console.log("ownedtimesharemonths repsonded w ", response.data);
+    })
+  }, [address]);
+
+  useEffect(() => {
     console.log("testing backend");
-    axios.get('/api/test').then(function (response) {
+    axios.get('/api/alltimesharemonths').then(function (response) {
       console.log("hey!");
-      console.log("response");
+      console.log("alltimesharemonths respondd with", response);
+      console.log(response);
+    }).catch(function (error) {
+      console.error(error);
     })
   }, []);
+
 
   useEffect(() => {
     setLandingPageData(JsonData)
