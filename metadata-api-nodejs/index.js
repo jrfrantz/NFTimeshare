@@ -143,26 +143,23 @@ app.get('/api/alltimesharemonths', async function (req, res) {
     var tokens = [];
     for (let i = 0; i < Math.min(supply, 25); i++) {
       var token = await nftimesharemonth.tokenByIndex(i);
-      console.log(token);
       var month = await nftimesharemonth.month(token.toString());
-      console.log(month);
       var url   = await nftimesharemonth.tokenURI(token.toString());
-      console.log(url);
       var metadata = await axios.get(urlify(url));
-      console.log(metadata);
       var media;
       var name;
       if (metadata.status == 200 && metadata.data) {
         media = metadata.data.image || metadata.data.image_data || metadata.animation_url || metadata.youtube_url;
         name = metadata.data.name;
       }
-      tokens.push([{
+      tokens.push({
         id: token.toString(),
         month: month.toString(),
         media: media.toString(),
         name: name.toString()
-      }]);
+      });
     }
+    console.log(tokens);
     res.json(tokens);
   } catch (error) {
     console.log(error);

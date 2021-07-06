@@ -10,6 +10,7 @@ import contractAddress from "../contracts/contract-address.json"
 import TestNFTArtifact from "../contracts/TestNFT.json"
 import { NFTimesharesBrowsable } from "../components/nftimesharesbrowsable"
 import { Jumbotron, Container } from 'react-bootstrap';
+import { NFTCardDeck } from '../components2/nftcarddeck';
 import axios from 'axios'
 export const scroll = new SmoothScroll('a[href*="#"]', {
   speed: 1000,
@@ -35,7 +36,7 @@ const Home = () => {
       }
       var assets = response.data.assets;
 
-      setPublicTimeshares({'nfts' : [...response.data.assets]})
+      //setPublicTimeshares({'nfts' : [...response.data.assets]})
     });
   }, []);
 
@@ -49,11 +50,13 @@ const Home = () => {
   }, [address]);
 
   useEffect(() => {
-    console.log("testing backend");
     axios.get('/api/alltimesharemonths').then(function (response) {
-      console.log("hey!");
-      console.log("alltimesharemonths respondd with", response);
-      console.log(response);
+      console.log("alltimesharemonths responded with", response);
+      if (response.status != 200 || !response.data) {
+        console.log("Bad response from server", response);
+        return;
+      }
+      setPublicTimeshares(response.data);
     }).catch(function (error) {
       console.error(error);
     })
@@ -106,6 +109,7 @@ const Home = () => {
           <p> bla h</p>
         </Container>
       </Jumbotron>
+      <NFTCardDeck nfts={publicTimeshares} />
       <Header data={landingPageData.Header} />
       <Pitch data={landingPageData.Pitch} />
       <NFTimesharesBrowsable nfts={getNFTimeshares()} />
