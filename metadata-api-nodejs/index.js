@@ -10,6 +10,7 @@ const { ethers } = require("ethers");
 const axios = require('axios');
 const PORT = process.env.PORT || 5000
 const alchemyKeyOnly = process.env.ALCHEMY_KEY || require('../secrets.json').alchemyKeyOnly;
+const OPENSEA_API_KEY = process.env.OPENSEA_API_KEY || require('../secrets.json').OPENSEA_API_KEY;
 const NFTimeshareArtifact      = require("./src/contracts/NFTimeshare.json");
 const NFTimeshareMonthArtifact = require("./src/contracts/NFTimeshareMonth.json");
 const contractAddress          = require("./src/contracts/contract-address.json");
@@ -20,11 +21,11 @@ const app = express()
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
 
+const OPENSEA_HEADER = {headers: {'X-API-KEY': OPENSEA_API_KEY}};
 // Static public files
 //app.use(express.static(path.join(__dirname, 'public')))
 
 setupContracts();
-
 //app.use('/', express.static('../frontend/build'));
 /*app.get('/', async function(req, res) {
   //res.send('Get ready for OpenSea!');
@@ -38,7 +39,7 @@ setupContracts();
 })*/
 //app.use(express.static(path.join(__dirname, "..", "frontend/build")));
 //app.use(express.static("../frontend/public"));
-//app.use(express.static(path.join(__dirname, "..", "dapp/build")));
+
 
 // need one for timeshare and one for timesharemonth
 app.get('/timesharemonth/:token_id', async function(req, res) {
@@ -46,7 +47,7 @@ app.get('/timesharemonth/:token_id', async function(req, res) {
   // 2/ (contract, tokenId) = wrappedNFT (tokenId)
   // 3/ call and read URI of underlying
   try {
-    const tokenId = parseInt(req.params.token_id);
+    const tokenId = req.params.token_id;
     console.log(tokenId);
     var underlyingTokenURI = await nftimesharemonth.underlyingTokenURI(tokenId);
     var monthStr = monthName(await nftimesharemonth.month(tokenId));
@@ -89,7 +90,7 @@ app.get('/timesharemonth/:token_id', async function(req, res) {
 });
 
 app.get('/timeshare/:token_id', async function(req, res) {
-  const tokenId = parseInt(req.params.token_id);
+  const tokenId = req.params.token_id;
   const timeshareMonthIds  = await nftimesharemonth.getTimeshareMonths(tokenId);
   const underlyingTokenURI = await nftimeshare.underlyingTokenURI(tokenId);
   var   underlyingMetadata = await axios.get(underlyingTokenURI);
@@ -117,56 +118,93 @@ app.get('/api/test', async function(req,res) {
   res.send("nice");
 })
 
+// to deposit
 app.get('/api/ownednfts/:owner/:pagination_token?', async function (req, res) {
-  const ownerAddr = parseInt(req.params.owner);
+  console.log('reached api ownednfts', req.params);
+  try {
+    const ownerAddr = req.params.owner;
+    const pagination_token = req.params.pagination_token ? parseInt(req.params.pagination_token) : 0;
+    var offset = 20*pagination_token;
+    const OWNED_ASSETS_URL = `https://rinkeby-api.opensea.io/api/v1/assets?owner=${ownerAddr}&order_direction=desc&offset=${offset}&limit=21`;
+    axios.get(OWNED_ASSETS_URL, OPENSEA_HEADER).then(function(response) {
+      if (response.status !== 200) {
+        res.send("Error in response from Opensea: ", response);
+      }
+      var assets = response.data.assets.filter((nft) => nft.asset_contract.address.toLowerCase() !== contractAddress.NFTimeshareMonth.toLowerCase());
+      assets = assets.map(function (nft)  {
+        nft.name = nft.name  || `Token ${nft.token_id} from contract at ${nft.asset_contract.address}`;
+        //nft.media = nft.media || nft.image_url || nft.image || nft.image_data || nft.animation_url || nft.youtube_url;
+        nft.media = nft.image_url;
+        nft.external_contract = nft.asset_contract.address
+        return nft;
+      });
+      res.json(assets);
+    }).catch((error) => {
+      console.log("Error in opensea call", error);
+      res.json(error);
+    });
+  } catch (error) {
+    console.log("Error is ", error);
+    res.json(error);
+  }
 });
 
-app.get('/api/ownedtimesharemonths/:owner', async function (req, res) {
+// to redeem
+app.get('/api/ownedtimesharemonths/:owner/:pagination_token?', async function (req, res) {
   const ownerAddr = req.params.owner;
-  console.log("Backend with " + ownerAddr);
+  console.log("Owned timesharemonths " + ownerAddr);
   if (!ownerAddr) {
-    res.send("Error: no owner specified in request to /ownedtimesharemonths api");
+    res.json("Error: no owner specified in request to /ownedtimesharemonths api");
   }
   var balance = await nftimesharemonth.balanceOf(ownerAddr);
   var tokens = [];
-  for (let i = 0 ; i < Math.min(balance, 20); i++ ) {
+  for (let i = 0 ; i < Math.min(balance, 21); i++ ) {
     var token = await nftimesharemonth.tokenOfOwnerByIndex(ownerAddr, i);
-    console.log(token);
-    tokens.push(token);
-  }
-  res.json({tokens});
-});
-
-app.get('/api/alltimesharemonths', async function (req, res) {
-  try {
-    var supply = await nftimesharemonth.totalSupply();
-    var tokens = [];
-    for (let i = 0; i < Math.min(supply, 25); i++) {
-      var token = await nftimesharemonth.tokenByIndex(i);
-      var month = await nftimesharemonth.month(token.toString());
-      var url   = await nftimesharemonth.tokenURI(token.toString());
-      var metadata = await axios.get(urlify(url));
-      var media;
-      var name;
-      if (metadata.status == 200 && metadata.data) {
-        media = metadata.data.image || metadata.data.image_data || metadata.animation_url || metadata.youtube_url;
-        name = metadata.data.name;
-      }
-      tokens.push({
-        id: token.toString(),
-        month: month.toString(),
-        media: media.toString(),
-        name: name.toString()
-      });
+    var month = await nftimesharemonth.month(token.toString());
+    var url   = await nftimesharemonth.tokenURI(token.toString());
+    var metadata = await axios.get(urlify(url));
+    var media;
+    var name;
+    if (metadata.status == 200 && metadata.data) {
+      media = metadata.data.image || metadata.data.image_url || metadata.data.image_data || metadata.animation_url || metadata.youtube_url;
+      name  = metadata.data.name;
     }
-    console.log(tokens);
-    res.json(tokens);
-  } catch (error) {
-    console.log(error);
+    tokens.push({
+      token_id: token.toString(),
+      month: monthName(month),
+      media: media ? media.toString() : null,
+      name: name.toString()
+    });
   }
+  res.json(tokens);
 });
 
+// for homescreen
+app.get('/api/alltimesharemonths/:pagination_token?', async function (req, res) {
+  const offset = req.params.pagination_token ? 20*parseInt(req.params.pagination_token) : 0;
+  const ALL_NFTIMESHARES_URL = `https://rinkeby-api.opensea.io/api/v1/assets?asset_contract_address=${contractAddress.NFTimeshareMonth.toLowerCase()}&order_direction=desc&offset=${offset}&limit=21`;
+  axios.get(ALL_NFTIMESHARES_URL, OPENSEA_HEADER).then(function(response) {
+    if (response.status !== 200) {
+      console.log("Error getting homepage timeshares ", response);
+      res.json(response);
+    }
+    console.log(response);
+    var assets = response.data.assets;
+    assets.map((nft) => {
+      nft.name = nft.name  || `Token ${nft.token_id} from contract at ${nft.asset_contract.address}`;
+      //nft.media = nft.media || nft.image || nft.image_url || nft.image_data || nft.animation_url || nft.youtube_url;
+      nft.media = nft.image_url;
+      var monthTrait = nft.traits.find((trait) => {
+        return trait.trait_type === "Month"
+      });
+      nft.month = monthTrait ? monthTrait.value : "";
+      return nft;
+    });
+    res.json(assets);
+  });
+});
 
+app.use(express.static(path.join(__dirname, "..", "dapp/build")));
 app.use(express.static("../dapp/public"));
 app.get('/*', function (req, res) {
   res.sendFile(path.join(__dirname, "../dapp/build", "index.html"));

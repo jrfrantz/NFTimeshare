@@ -1,69 +1,34 @@
 import { useState, useEffect } from 'react'
-import { Explainer } from '../components/explainer'
-import { Redeemable } from '../components/redeemable'
-import { Depositable } from '../components/depositable'
-import JsonData from '../data/nft_data.json'
 import SmoothScroll from 'smooth-scroll'
-import { Modal } from '../components/modal'
 import axios from 'axios'
 import { ethers } from 'ethers'
 import contractAddress from "../contracts/contract-address.json"
 import TestNFTArtifact from "../contracts/TestNFT.json"
 import NFTimeshareArtifact from "../contracts/NFTimeshare.json"
 import NFTimeshareMonthArtifact from "../contracts/NFTimeshareMonth.json"
-import { ConnectWallet } from '../components/connectwallet'
+//import { ConnectWallet } from '../components/connectwallet'
+import { DepositRedeemExplainer } from "../components2/depositredeemexplainer"
+import { Redeemable } from '../components2/redeemable'
+import { Depositable } from '../components2/depositable'
+import { DepositModal } from '../components2/depositmodal'
+import { RedeemModal } from '../components2/redeemmodal'
 import ERC721abi from "../contracts/ERC721abi.json"
-export const scroll = new SmoothScroll('a[href*="#"]', {
-  speed: 1000,
-  speedAsDuration: true,
-})
+import { Modal } from 'react-bootstrap'
 
 const GetStarted = () => {
-  const [nftData, setNftData] = useState({})
   const [address, setAddress] = useState("");
-  const [modalState, setModalState] = useState(null);
   const [ownedNFTs, setOwnedNFTs] = useState({});
   const [ownedTimeshares, setOwnedTimeshares] = useState({});
   const [nftimeshare, setNftimeshare] = useState({});
   const [nftimesharemonth, setNftimesharemonth] = useState({});
+  const [isLoadingOwnedTimeshares, setLoadingOwnedTimeshares] = useState(false);
+  const [isLoadingOwnedNFTs, setLoadingOwnedNFTs] = useState(false);
+  const [selectedNFT, setSelectedNFT] = useState(null);
 
-  useEffect(() => {
-    if (!address) {
-      return;
-    }
-    const ownedNFTsURL = 'https://rinkeby-api.opensea.io/api/v1/assets?owner='
-                + address
-                + '&order_direction=desc&offset=0&limit=20';
-    axios.get(ownedNFTsURL).then(function (response) {
-      console.log("before filter", response.data.assets);
-      setOwnedNFTs(
-        {
-          'nfts': [
-            ...response.data.assets
-          ].filter((asset) => asset.asset_contract.address.toLowerCase() !== contractAddress.NFTimeshareMonth.toLowerCase())
-        }
-      );
-      console.log("after filter", ownedNFTs);
-    });
-  }, [address]);
-  useEffect(() => {
-    if (!address) {
-      return;
-    }
-    const ownedNFTimeshareMonthsURL = 'https://rinkeby-api.opensea.io/api/v1/assets?owner='
-                  + address
-                  + '&asset_contract_address=' + contractAddress.NFTimeshareMonth.toLowerCase()
-                  + '&order_direction=desc&offset=0&limit=20';
-    axios.get(ownedNFTimeshareMonthsURL).then(function (response) {
-      setOwnedTimeshares({
-        'nfts': [
-          ...response.data.assets
-        ]
-      });
-    });
-  }, [address]);
+  // get address
   useEffect(() => {
     if (!window.ethereum) {
+      console.log("no ethereum window");
       return;
     }
     window.ethereum.on("accountsChanged", ([newAddress]) => {
@@ -71,6 +36,41 @@ const GetStarted = () => {
       setAddress(newAddress);
     })
   }, []);
+
+
+  // all owned NFTs, backend
+  useEffect(() => {
+    if (!address) {
+      return;
+    }
+    const OWNED_ASSETS_API = `/api/ownednfts/${address}/`; //todo pagination
+    setLoadingOwnedNFTs(true);
+    axios.get(OWNED_ASSETS_API).then(function(response) {
+      if (response.status !== 200) {
+        console.log("Error from backend", response);
+        return;
+      }
+      console.log("Owned nfts are", response);
+      setOwnedNFTs(response.data);
+      setLoadingOwnedNFTs(false);
+    });
+  }, [address])
+  // all owned timesharemonths, backend
+  useEffect(() => {
+    if (!address) {
+      return;
+    }
+    const API_OWNED_NFTIMESHAREMONTHS = `/api/ownedtimesharemonths/${address}`;
+    setLoadingOwnedTimeshares(true);
+    axios.get(API_OWNED_NFTIMESHAREMONTHS).then(function(response) {
+      console.log("owned tsmonths", response);
+      setOwnedTimeshares(response.data);
+      setLoadingOwnedTimeshares(false);
+    })
+  }, [address])
+
+
+
 
   const connectWallet = async () => {
     const [selectedAddress] = await window.ethereum.enable();
@@ -92,23 +92,21 @@ const GetStarted = () => {
     setNftimesharemonth(tTimeshareMonth);
   };
 
-  function onClickNft(nft) {
-    console.log('hey: ', nft);
-    setModalState({nft});
+  const onClickDeposit = (nft) => {
+    console.log("selected an nft" , nft);
+    setSelectedNFT({nft: nft, method: "DEPOSIT"});
   }
-  function onClickDepositableNft(nft) {
-    onClickNft({action: "deposit", ...nft})
-  }
-  function onClickRedeemableNft(nft) {
-    onClickNft({action: "redeem", ...nft})
+  const onClickRedeem = (nft) => {
+    console.log("selected an nft: ", nft)
+    setSelectedNFT({nft: nft, method: "REDEEM"});
   }
 
-  function onCloseModal() {
-    setModalState(null);
+  const handleCloseModal = () => {
+    setSelectedNFT(null);
   }
 
   // should be triggered when someone presses Lets do it the modal
-  async function depositNft(externalContract, externalTokenId) {
+  async function confirmDepositNft(externalContract, externalTokenId) {
     console.log("depositing");
     console.log("contract, token: ", externalContract, externalTokenId);
     console.log(new ethers.providers.Web3Provider(window.ethereum).getSigner(0));
@@ -129,76 +127,39 @@ const GetStarted = () => {
 
   // should be triggered when someone presses redeem in the modal on any timesharemonth
   async function redeemNft(timeshareMonthTokenId) {
-    console.log("redeeming");
+    console.log("redeeming with ", timeshareMonthTokenId);
     let parentTokenId = await nftimesharemonth.getParentTimeshare(timeshareMonthTokenId);
     console.log("parent token id is ", parentTokenId);
     await nftimeshare.redeem(parentTokenId, address);
   }
 
-// not used
-  function getNftData() {
-    if (!nftData.nfts) {
-      return null;
-    }
-    return nftData.nfts.map(nft => {
-      return {
-        clickImageUrl: `https://opensea.io/assets/${nft.contractAddr}/${nft.tokenId}`,
-        //onClickButton: () => onClickNft(nft),
-        buttonText: "Deposit",
-        ...nft,
-      };
-    });
-  }
-
-
-  function getOwnedNFTData() {
-    console.log(ownedNFTs);
-    if (!ownedNFTs.nfts) {
-      console.log("no owned nftdata");
-      return null;
-    }
-    return ownedNFTs.nfts.map(nft => {
-      return {
-        img: nft.image_thumbnail_url,
-        tokenId: nft.token_id,
-        contractAddr: nft.asset_contract.address,
-        name: nft.name,
-        buttonText: "Deposit",
-        onClickButton: () => onClickDepositableNft(nft),
-        // clickImageUrl: pop the modal or nft.permalink to opensea
-        ...nft,
-      };
-    });
-  }
-
-  function getTimeshareData(){
-    console.log(ownedTimeshares);
-    if(!ownedTimeshares.nfts) {
-      return null;
-    }
-    return ownedTimeshares.nfts.map(nft => {
-      return {
-        img: nft.image_thumbnail_url,
-        tokenId: nft.token_id,
-        contractAddr: nft.asset_contract.address,
-        name: nft.name,
-        buttonText: "Redeem",
-        onClickButton: () => onClickRedeemableNft(nft),
-        ...nft,
-      };
-    });
-  }
-
   return (
     <div>
-      <Modal modalState={modalState} closeModal={onCloseModal}
-              depositFunc={depositNft} redeemFunc={redeemNft}/>
-      <Explainer />
-      <ConnectWallet connectedWallet={address} connectFunc={() => connectWallet()}/>
-      <Depositable nfts={getOwnedNFTData()}/>
-      <Redeemable nfts={getTimeshareData()} />
-    </div>
-  )
+      <DepositRedeemExplainer address={address} connectFunc={()=>connectWallet()} />
+      {isLoadingOwnedNFTs ?
+          <p>"Loading..."</p>
+          : <Depositable nfts={ownedNFTs} onClickDeposit={onClickDeposit}/> }
+      <hr />
+      {isLoadingOwnedTimeshares ?
+          <p>"Loading..."</p>
+          : <Redeemable nfts={ownedTimeshares} onClickRedeem={onClickRedeem}/>}
+      <DepositModal nftInfo={selectedNFT}
+        handleCloseFunc={handleCloseModal}
+        confirmDepositFunc={confirmDepositNft}/>
+    <RedeemModal nftInfo={selectedNFT}
+      handleCloseFunc={handleCloseModal}
+      confirmRedeemFunc={redeemNft}/>
+  </div>
+)
 }
+
+/*
+<Modal modalState={modalState} closeModal={onCloseModal}
+        depositFunc={depositNft} redeemFunc={redeemNft}/>
+<Explainer />
+<ConnectWallet connectedWallet={address} connectFunc={() => connectWallet()}/>
+<Depositable nfts={getOwnedNFTData()}/>
+<Redeemable nfts={getTimeshareData()} />
+*/
 
 export default GetStarted

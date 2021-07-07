@@ -7,6 +7,7 @@ import {
 import Home from "./pages/home";
 import GetStarted from "./pages/getstarted";
 
+
 export default function App() {
   return (
     <Router>
