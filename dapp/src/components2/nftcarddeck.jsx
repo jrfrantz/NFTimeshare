@@ -28,6 +28,9 @@ export const NFTCardDeck = (props) => {
       <h3> Browse Timeshares </h3>
       <CardColumns>
         {props.nfts.map((nft, i) => {
+          if (!nft.month) {
+            console.log(nft);
+          }
           return (
             <Card style={{width: '256px'}} key={"nft_card_"+i}>
               <Card.Img variant="top"
@@ -40,7 +43,7 @@ export const NFTCardDeck = (props) => {
               </Card.Title>
               <Card.Body>
                 <Button variant="outline-secondary"
-                  href={`https://opensea.io/assets/${contractAddress.NFTimeshareMonth}/${nft.token_id}`}
+                  href={nft.permalink}
                   target="_blank" rel="noopener noreferrer">
                   Buy on Opensea
                 </Button>

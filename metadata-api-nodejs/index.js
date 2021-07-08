@@ -188,19 +188,26 @@ app.get('/api/alltimesharemonths/:pagination_token?', async function (req, res) 
       console.log("Error getting homepage timeshares ", response);
       res.json(response);
     }
-    console.log(response);
     var assets = response.data.assets;
-    assets.map((nft) => {
-      nft.name = nft.name  || `Token ${nft.token_id} from contract at ${nft.asset_contract.address}`;
-      //nft.media = nft.media || nft.image || nft.image_url || nft.image_data || nft.animation_url || nft.youtube_url;
-      nft.media = nft.image_url;
-      var monthTrait = nft.traits.find((trait) => {
-        return trait.trait_type === "Month"
-      });
-      nft.month = monthTrait ? monthTrait.value : "";
-      return nft;
+    assets = assets
+      .filter((nft) => {return nft.owner.address !== "0x0000000000000000000000000000000000000000"})
+      .map((nft) => {
+        if (!nft.image_url) {
+          console.log(nft);
+        }
+        nft.name = nft.name  || `Token ${nft.token_id} from contract at ${nft.asset_contract.address}`;
+        //nft.media = nft.media || nft.image || nft.image_url || nft.image_data || nft.animation_url || nft.youtube_url;
+        nft.media = nft.image_url;
+        var monthTrait = nft.traits.find((trait) => {
+          return trait.trait_type === "Month"
+        });
+        nft.month = monthTrait ? monthTrait.value : "";
+        return nft;
     });
+    console.log("about to send json with ", assets);
     res.json(assets);
+  }).catch((error) => {
+    console.log(error);
   });
 });
 
