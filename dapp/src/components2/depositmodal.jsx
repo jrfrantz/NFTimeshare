@@ -13,7 +13,6 @@ export const DepositModal = (props) => {
       </Modal.Header>
       <Image src={nft.media} width='100%'/>
       <Modal.Body>
-
           Turn this NFT into a Timeshare. In exchange for this token, you'll get back
           12 NFTs, one for each month.
       </Modal.Body>

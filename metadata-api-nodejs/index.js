@@ -119,26 +119,29 @@ app.get('/api/test', async function(req,res) {
 })
 
 // to deposit
-app.get('/api/ownednfts/:owner/:pagination_token?', async function (req, res) {
+app.get('/api/ownednfts/:owner/:offset?', async function (req, res) {
   console.log('reached api ownednfts', req.params);
   try {
     const ownerAddr = req.params.owner;
-    const pagination_token = req.params.pagination_token ? parseInt(req.params.pagination_token) : 0;
-    var offset = 20*pagination_token;
+    const offset = req.params.offset ? parseInt(req.params.offset) : 0;
     const OWNED_ASSETS_URL = `https://rinkeby-api.opensea.io/api/v1/assets?owner=${ownerAddr}&order_direction=desc&offset=${offset}&limit=21`;
     axios.get(OWNED_ASSETS_URL, OPENSEA_HEADER).then(function(response) {
       if (response.status !== 200) {
         res.send("Error in response from Opensea: ", response);
       }
-      var assets = response.data.assets.filter((nft) => nft.asset_contract.address.toLowerCase() !== contractAddress.NFTimeshareMonth.toLowerCase());
-      assets = assets.map(function (nft)  {
+      //var assets = response.data.assets.filter((nft) => nft.asset_contract.address.toLowerCase() !== contractAddress.NFTimeshareMonth.toLowerCase());
+      var assets = response.data.assets.map(function (nft)  {
         nft.name = nft.name  || `Token ${nft.token_id} from contract at ${nft.asset_contract.address}`;
         //nft.media = nft.media || nft.image_url || nft.image || nft.image_data || nft.animation_url || nft.youtube_url;
         nft.media = nft.image_url;
         nft.external_contract = nft.asset_contract.address
         return nft;
       });
-      res.json(assets);
+      var nextOffset = assets.length > 20 ? offset + 20 : -1;
+      res.json({
+        nfts: assets.slice(0,20),
+        nextOffset: nextOffset
+      });
     }).catch((error) => {
       console.log("Error in opensea call", error);
       res.json(error);
@@ -150,15 +153,16 @@ app.get('/api/ownednfts/:owner/:pagination_token?', async function (req, res) {
 });
 
 // to redeem
-app.get('/api/ownedtimesharemonths/:owner/:pagination_token?', async function (req, res) {
+app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
   const ownerAddr = req.params.owner;
-  console.log("Owned timesharemonths " + ownerAddr);
+  const offset = req.params.offset ? parseInt(req.params.offset) : 0;
+  console.log("Owned timesharemonths " + ownerAddr + ", " + req.params.offset);
   if (!ownerAddr) {
     res.json("Error: no owner specified in request to /ownedtimesharemonths api");
   }
   var balance = await nftimesharemonth.balanceOf(ownerAddr);
   var tokens = [];
-  for (let i = 0 ; i < Math.min(balance, 21); i++ ) {
+  for (let i = offset ; i < Math.min(balance, offset+21); i++ ) {
     var token = await nftimesharemonth.tokenOfOwnerByIndex(ownerAddr, i);
     var month = await nftimesharemonth.month(token.toString());
     var url   = await nftimesharemonth.tokenURI(token.toString());
@@ -176,13 +180,17 @@ app.get('/api/ownedtimesharemonths/:owner/:pagination_token?', async function (r
       name: name.toString()
     });
   }
-  res.json(tokens);
+  var nextOffset = (offset+20 < balance) ? offset+20 : -1;
+  res.json({
+    nfts: tokens.slice(0,20),
+    nextOffset: nextOffset
+  });
 });
 
 // for homescreen
 app.get('/api/alltimesharemonths/:pagination_token?', async function (req, res) {
   const offset = req.params.pagination_token ? 20*parseInt(req.params.pagination_token) : 0;
-  const ALL_NFTIMESHARES_URL = `https://rinkeby-api.opensea.io/api/v1/assets?asset_contract_address=${contractAddress.NFTimeshareMonth.toLowerCase()}&order_direction=desc&offset=${offset}&limit=21`;
+  const ALL_NFTIMESHARES_URL = `https://rinkeby-api.opensea.io/api/v1/assets?asset_contract_address=${contractAddress.NFTimeshareMonth.toLowerCase()}&order_by=token_id&order_direction=desc&offset=${offset}&limit=21`;
   axios.get(ALL_NFTIMESHARES_URL, OPENSEA_HEADER).then(function(response) {
     if (response.status !== 200) {
       console.log("Error getting homepage timeshares ", response);

@@ -17,12 +17,19 @@ import { Modal } from 'react-bootstrap'
 
 const GetStarted = () => {
   const [address, setAddress] = useState("");
-  const [ownedNFTs, setOwnedNFTs] = useState({});
-  const [ownedTimeshares, setOwnedTimeshares] = useState({});
+
+
   const [nftimeshare, setNftimeshare] = useState({});
   const [nftimesharemonth, setNftimesharemonth] = useState({});
+
+  const [ownedTimeshares, setOwnedTimeshares] = useState([]);
+  const [ownedTimesharesOffset, setOwnedTimesharesOffset] = useState(0);
   const [isLoadingOwnedTimeshares, setLoadingOwnedTimeshares] = useState(false);
+
+  const [ownedNFTs, setOwnedNFTs] = useState([]);
+  const [ownedNFTsOffset, setOwnedNFTsOffset] = useState(0);
   const [isLoadingOwnedNFTs, setLoadingOwnedNFTs] = useState(false);
+
   const [selectedNFT, setSelectedNFT] = useState(null);
 
   // get address
@@ -39,11 +46,11 @@ const GetStarted = () => {
 
 
   // all owned NFTs, backend
-  useEffect(() => {
+  function loadOwnedNFTs() {
     if (!address) {
       return;
     }
-    const OWNED_ASSETS_API = `/api/ownednfts/${address}/`; //todo pagination
+    const OWNED_ASSETS_API = `/api/ownednfts/${address}/${ownedNFTsOffset}`; //todo pagination
     setLoadingOwnedNFTs(true);
     axios.get(OWNED_ASSETS_API).then(function(response) {
       if (response.status !== 200) {
@@ -51,23 +58,32 @@ const GetStarted = () => {
         return;
       }
       console.log("Owned nfts are", response);
-      setOwnedNFTs(response.data);
+      var cleanedAssets = response.data.nfts.filter((nft) => {
+        return nft.asset_contract.address.toLowerCase() !== contractAddress.NFTimeshareMonth.toLowerCase()
+      });
+      setOwnedNFTs((prevnfts) => [...prevnfts, ...cleanedAssets]);
+      setOwnedNFTsOffset(response.data.nextOffset);
       setLoadingOwnedNFTs(false);
     });
-  }, [address])
+  }
+
   // all owned timesharemonths, backend
-  useEffect(() => {
+  function loadOwnedTimeshareMonths() {
     if (!address) {
       return;
     }
-    const API_OWNED_NFTIMESHAREMONTHS = `/api/ownedtimesharemonths/${address}`;
+    const API_OWNED_NFTIMESHAREMONTHS = `/api/ownedtimesharemonths/${address}/${ownedTimesharesOffset}`;
     setLoadingOwnedTimeshares(true);
     axios.get(API_OWNED_NFTIMESHAREMONTHS).then(function(response) {
       console.log("owned tsmonths", response);
-      setOwnedTimeshares(response.data);
+      setOwnedTimeshares((prevnfts) => [...prevnfts, ...response.data.nfts]);
+      setOwnedTimesharesOffset(response.data.nextOffset);
       setLoadingOwnedTimeshares(false);
     })
-  }, [address])
+  }
+  useEffect(() => { loadOwnedNFTs(); }, [address])
+
+  useEffect(() => { loadOwnedTimeshareMonths(); }, [address])
 
 
 
@@ -136,17 +152,17 @@ const GetStarted = () => {
   return (
     <div>
       <DepositRedeemExplainer address={address} connectFunc={()=>connectWallet()} />
-      {isLoadingOwnedNFTs ?
-          <p>"Loading..."</p>
-          : <Depositable nfts={ownedNFTs} onClickDeposit={onClickDeposit}/> }
+      <Depositable isLoading={isLoadingOwnedNFTs}
+        nfts={ownedNFTs} onClickDeposit={onClickDeposit}
+        loadMoreFunc={loadOwnedNFTs} hasMore={ownedNFTsOffset}/>
       <hr />
-      {isLoadingOwnedTimeshares ?
-          <p>"Loading..."</p>
-          : <Redeemable nfts={ownedTimeshares} onClickRedeem={onClickRedeem}/>}
+      <Redeemable isLoading={isLoadingOwnedTimeshares}
+          nfts={ownedTimeshares} onClickRedeem={onClickRedeem}
+          loadMoreFunc={loadOwnedTimeshareMonths} hasMore={ownedTimesharesOffset}/>
       <DepositModal nftInfo={selectedNFT}
         handleCloseFunc={handleCloseModal}
         confirmDepositFunc={confirmDepositNft}/>
-    <RedeemModal nftInfo={selectedNFT}
+      <RedeemModal nftInfo={selectedNFT}
       handleCloseFunc={handleCloseModal}
       confirmRedeemFunc={redeemNft}/>
   </div>
