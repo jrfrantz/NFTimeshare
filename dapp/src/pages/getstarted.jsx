@@ -14,6 +14,7 @@ import { DepositModal } from '../components2/depositmodal'
 import { RedeemModal } from '../components2/redeemmodal'
 import ERC721abi from "../contracts/ERC721abi.json"
 import { Modal } from 'react-bootstrap'
+import { Credits } from '../components2/credits'
 
 const GetStarted = () => {
   const [address, setAddress] = useState("");
@@ -31,6 +32,9 @@ const GetStarted = () => {
   const [isLoadingOwnedNFTs, setLoadingOwnedNFTs] = useState(false);
 
   const [selectedNFT, setSelectedNFT] = useState(null);
+  const [pendingDeposits, setPendingDeposits] = useState(new Set());
+  const [pendingRedemptions, setPendingRedemptions] = useState(new Set());
+  // TODO change the redemptions to a JSON and useEffect to monitor for changes.
 
   // get address
   useEffect(() => {
@@ -58,10 +62,10 @@ const GetStarted = () => {
         return;
       }
       console.log("Owned nfts are", response);
-      var cleanedAssets = response.data.nfts.filter((nft) => {
+      /*var cleanedAssets = response.data.nfts.filter((nft) => {
         return nft.asset_contract.address.toLowerCase() !== contractAddress.NFTimeshareMonth.toLowerCase()
-      });
-      setOwnedNFTs((prevnfts) => [...prevnfts, ...cleanedAssets]);
+      });*/ //took care of this in the api hopefully.
+      setOwnedNFTs((prevnfts) => [...prevnfts, ...response.data.nfts]);
       setOwnedNFTsOffset(response.data.nextOffset);
       setLoadingOwnedNFTs(false);
     });
@@ -131,24 +135,55 @@ const GetStarted = () => {
       ERC721abi.interface,
       new ethers.providers.Web3Provider(window.ethereum).getSigner(0)
     );
+
+    const pendingDeposit = {
+      externalContract: externalContract,
+      externalTokenId: externalTokenId
+    }
+    setPendingDeposits((deposits) => {
+      deposits.add(JSON.stringify(pendingDeposit));
+      return deposits;
+    });
+
     await erc721Contract.setApprovalForAll(contractAddress.NFTimeshare, true);
-    await nftimeshare.deposit(
+    var tx = await nftimeshare.deposit(
       externalContract,
       externalTokenId,
       address,
       address
     );
-    console.log("deposited asset");
+    tx.wait().then(() => {
+      setPendingDeposits((deposits) => {
+        deposits.delete(JSON.stringify(pendingDeposit));
+        return deposits;
+      });
+    });
+
   }
 
   // should be triggered when someone presses redeem in the modal on any timesharemonth
   async function redeemNft(timeshareMonthTokenId) {
     console.log("redeeming with ", timeshareMonthTokenId);
     let parentTokenId = await nftimesharemonth.getParentTimeshare(timeshareMonthTokenId);
-    console.log("parent token id is ", parentTokenId);
-    await nftimeshare.redeem(parentTokenId, address);
+    let siblingIds = await nftimesharemonth.getTimeshareMonths(parentTokenId);
+    siblingIds = siblingIds.map((elem) => elem.toString().toLowerCase());
+    console.log("Redemptions, sibs", )
+    setPendingRedemptions((redemptions) => {
+      siblingIds.forEach((tokenId) => {
+        redemptions.add(tokenId)
+      })
+      return redemptions;
+    })
+    var tx = await nftimeshare.redeem(parentTokenId, address);
+    await tx.wait();
+    setPendingRedemptions((redemptions) => {
+      siblingIds.forEach((tokenId) => {
+        redemptions.delete(tokenId);
+      });
+      return redemptions;
+    });
   }
-
+  console.log("entering render with ", pendingDeposits, pendingRedemptions);
   return (
     <div>
       <DepositRedeemExplainer address={address} connectFunc={()=>connectWallet()} />
@@ -161,10 +196,13 @@ const GetStarted = () => {
           loadMoreFunc={loadOwnedTimeshareMonths} hasMore={ownedTimesharesOffset}/>
       <DepositModal nftInfo={selectedNFT}
         handleCloseFunc={handleCloseModal}
-        confirmDepositFunc={confirmDepositNft}/>
+        confirmDepositFunc={confirmDepositNft}
+        pendingDeposits={pendingDeposits}/>
       <RedeemModal nftInfo={selectedNFT}
       handleCloseFunc={handleCloseModal}
-      confirmRedeemFunc={redeemNft}/>
+      confirmRedeemFunc={redeemNft}
+      pendingRedemptions={pendingRedemptions}/>
+    <Credits />
   </div>
 )
 }

@@ -22,35 +22,23 @@ export const scroll = new SmoothScroll('a[href*="#"]', {
 const Home = () => {
   const [address, setAddress] = useState("");
   const [testNFT, setTestNFT] = useState({});
-  const [publicTimeshares, setPublicTimeshares] = useState([])
-  const [loadingState, setLoadingState] = useState({isLoading:false, hasMore:false, page:1})
 
+  const [publicTimeshares, setPublicTimeshares] = useState([])
+  const [publicTimesharesOffset, setPublicTimesharesOffset] = useState(0);
+  const [isLoading, setIsLoading] = useState(false)
 
 
   const loadMoreTimeshareMonths = () => {
-    setLoadingState((prevstate) => {
-      return {
-        ...prevstate,
-        isLoading: true
-      }
-    })
-    axios.get('/api/alltimesharemonths').then(function (response) {
-      console.log("alltimesharemonths responded with", response);
+    const ALL_TIMESHARES_API = `/api/alltimesharemonths/${publicTimesharesOffset}`;
+    setIsLoading(true);
+    axios.get(ALL_TIMESHARES_API).then(function (response) {
       if (response.status != 200 || !response.data) {
         console.log("Bad response from server", response);
         return;
       }
-      setPublicTimeshares((oldtimeshares) => {
-
-        return [...oldtimeshares, ...response.data]
-      });
-      setLoadingState((prevstate) => {
-        return {
-          isLoading: false,
-          hasMore:(response.data.length > 20),
-          page:prevstate.page+1
-        }
-      })
+      setPublicTimeshares((oldtimeshares) => [...oldtimeshares, ...response.data.nfts]);
+      setPublicTimesharesOffset(response.data.nextOffset);
+      setIsLoading(false);
     }).catch(function (error) {
       console.error(error);
     })
@@ -91,7 +79,7 @@ const Home = () => {
       <TimeshareJumbotron />
       <HowItWorks />
     <hr />
-  <NFTCardDeck nfts={publicTimeshares} loadingState={loadingState} />
+  <NFTCardDeck nfts={publicTimeshares} loadingState={isLoading} />
 <Button variant='outline-secondary' onClick={loadMoreTimeshareMonths}>Load more</Button>
     {false && testNFT && <Button onClick={() => connectWallet()}>CNECT NFT</Button>}
     {false && testNFT && <Button onClick={() => testNFT.awardTestNFT()}>Award Test NFT</Button>}

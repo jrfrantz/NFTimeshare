@@ -8,7 +8,9 @@ export const Redeemable = (props) => {
 
   return (
     <div>
-      <h6>If you own timeshares, you can redeem them here </h6>
+      { !!props.nfts.length &&
+        <h6>If you own all 12 timeshares, you can redeem it back </h6>
+      }
       <CardColumns>
         {props.nfts.map((nft, i) => {
           return (
@@ -28,7 +30,7 @@ export const Redeemable = (props) => {
       </CardColumns>
       {props.isLoading &&
         <div>
-          <Spinner animation='grow'/>
+          <Spinner animation='outline'/>
         <p>Loading your timeshares from the blockchain. This usually takes a minute...</p>
         </div>
       }

@@ -129,15 +129,22 @@ app.get('/api/ownednfts/:owner/:offset?', async function (req, res) {
       if (response.status !== 200) {
         res.send("Error in response from Opensea: ", response);
       }
-      //var assets = response.data.assets.filter((nft) => nft.asset_contract.address.toLowerCase() !== contractAddress.NFTimeshareMonth.toLowerCase());
-      var assets = response.data.assets.map(function (nft)  {
+
+      var assets = response.data.assets;
+      const nextOffset = assets.length > 20 ? offset + 20 : -1;
+
+      assets = assets.filter((nft) =>
+        nft.asset_contract.address.toLowerCase() !==
+        contractAddress.NFTimeshareMonth.toLowerCase()
+      );
+      assets = assets.map(function (nft)  {
         nft.name = nft.name  || `Token ${nft.token_id} from contract at ${nft.asset_contract.address}`;
         //nft.media = nft.media || nft.image_url || nft.image || nft.image_data || nft.animation_url || nft.youtube_url;
         nft.media = nft.image_url;
         nft.external_contract = nft.asset_contract.address
         return nft;
       });
-      var nextOffset = assets.length > 20 ? offset + 20 : -1;
+
       res.json({
         nfts: assets.slice(0,20),
         nextOffset: nextOffset
@@ -188,15 +195,16 @@ app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
 });
 
 // for homescreen
-app.get('/api/alltimesharemonths/:pagination_token?', async function (req, res) {
-  const offset = req.params.pagination_token ? 20*parseInt(req.params.pagination_token) : 0;
+app.get('/api/alltimesharemonths/:offset?', async function (req, res) {
+  const offset = req.params.offset ? parseInt(req.params.offset) : 0;
   const ALL_NFTIMESHARES_URL = `https://rinkeby-api.opensea.io/api/v1/assets?asset_contract_address=${contractAddress.NFTimeshareMonth.toLowerCase()}&order_by=token_id&order_direction=desc&offset=${offset}&limit=21`;
   axios.get(ALL_NFTIMESHARES_URL, OPENSEA_HEADER).then(function(response) {
     if (response.status !== 200) {
-      console.log("Error getting homepage timeshares ", response);
       res.json(response);
     }
+
     var assets = response.data.assets;
+    const nextOffset = assets.length > 20 ? offset+20 : -1;
     assets = assets
       .filter((nft) => {return nft.owner.address !== "0x0000000000000000000000000000000000000000"})
       .map((nft) => {
@@ -213,7 +221,10 @@ app.get('/api/alltimesharemonths/:pagination_token?', async function (req, res) 
         return nft;
     });
     console.log("about to send json with ", assets);
-    res.json(assets);
+    res.json({
+      nfts: assets,
+      nextOffset: nextOffset
+    });
   }).catch((error) => {
     console.log(error);
   });
