@@ -22,6 +22,7 @@ const GetStarted = () => {
 
   const [nftimeshare, setNftimeshare] = useState({});
   const [nftimesharemonth, setNftimesharemonth] = useState({});
+  const [ethersProvider, setEthersProvider] = useState(null);
 
   const [ownedTimeshares, setOwnedTimeshares] = useState([]);
   const [ownedTimesharesOffset, setOwnedTimesharesOffset] = useState(0);
@@ -96,7 +97,12 @@ const GetStarted = () => {
     const [selectedAddress] = await window.ethereum.enable();
     console.log(selectedAddress);
 
-    let prov = new ethers.providers.Web3Provider(window.ethereum);
+    let prov = new ethers.providers.Web3Provider(window.ethereum, "any");
+    prov.on("network", (newNetwork, oldNetwork) => {
+        if (oldNetwork) {
+            window.location.reload();
+        }
+    });
     let tTimeshareMonth = new ethers.Contract(
       contractAddress.NFTimeshareMonth,
       NFTimeshareMonthArtifact.abi,
@@ -110,6 +116,7 @@ const GetStarted = () => {
     setAddress(selectedAddress);
     setNftimeshare(tTimeshare);
     setNftimesharemonth(tTimeshareMonth);
+    setEthersProvider(prov);
   };
 
   const onClickDeposit = (nft) => {
@@ -152,7 +159,14 @@ const GetStarted = () => {
       address,
       address
     );
+    console.log('tx submitted', pendingDeposit);
+    /*console.log('entering redeem'); // analog from redeem
+    var tx = await nftimeshare.redeem(parentTokenId, address);
+    console.log('tx submitted ', tx);
+    ethersProvider.waitForTransaction(tx.hash, 5);
+    console.log('wait for completed', tx);*/
     tx.wait().then(() => {
+      console.log("tx finished", pendingDeposit);
       setPendingDeposits((deposits) => {
         deposits.delete(JSON.stringify(pendingDeposit));
         return deposits;
@@ -174,8 +188,14 @@ const GetStarted = () => {
       })
       return redemptions;
     })
+    console.log('entering redeem');
     var tx = await nftimeshare.redeem(parentTokenId, address);
-    await tx.wait();
+    console.log('tx submitted ', tx);
+    ethersProvider.waitForTransaction(tx.hash, 5);
+    console.log('wait for completed', tx);
+     // provider.waitForTransaction(hash, confirms?, timeout?)
+    console.log('submitted redeem', siblingIds);
+    console.log('finishd waiting for tx redeem', siblingIds);
     setPendingRedemptions((redemptions) => {
       siblingIds.forEach((tokenId) => {
         redemptions.delete(tokenId);

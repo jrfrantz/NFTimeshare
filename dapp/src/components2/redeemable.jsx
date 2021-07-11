@@ -14,7 +14,7 @@ export const Redeemable = (props) => {
       <CardColumns>
         {props.nfts.map((nft, i) => {
           return (
-            <Card style={{width: '30rem'}} key={`deposit_card_${i}`}>
+            <Card style={{width: '256px'}} key={`deposit_card_${i}`}>
               <Card.Img variant="top" src={nft.media} />
             <Card.Body>
               <Card.Title>

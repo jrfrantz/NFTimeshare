@@ -10,7 +10,7 @@ export const Depositable = (props) => {
       <CardColumns>
         {props.nfts.map((nft, i) => {
           return (
-            <Card key={`deposit_card_${i}`}>
+            <Card style={{width: '256px'}}key={`deposit_card_${i}`}>
               <Card.Title>
                 <p>{nft.name} test</p>
               </Card.Title>
@@ -28,7 +28,7 @@ export const Depositable = (props) => {
       </CardColumns>
       {props.isLoading &&
          <Spinner animation='border' variant='dark' /> }
-      {props.hasMore > 0 && !props.isLoading && 
+      {props.hasMore > 0 && !props.isLoading &&
         <Button onClick={props.loadMoreFunc} variant='outline-secondary'>
           Load more
         </Button>
