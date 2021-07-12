@@ -161,7 +161,7 @@ describe("NFTimeshare and NFTimeshareMonths contract", function () {
       var timeshareURI = await tTimeshare.tokenURI(timeshareTokenId);
       var timeshareMonthURI = await tTimeshareMonth.tokenURI(monthTokenIds[0]);
       var wrappedURI = await tExternalNFT.tokenURI(externalTokenId);
-      const baseURL = "www.nftimeshares.fun/";
+      const baseURL = "http://www.nftimeshares.fun/";
       expect(timeshareURI)
       .to.equal(baseURL + "timeshare/" + timeshareTokenId.toString());
       expect(timeshareMonthURI)
@@ -349,6 +349,12 @@ describe("NFTimeshare and NFTimeshareMonths contract", function () {
         expect(mo).to.equal(i);
       }
     });
+    it("Should enumerate all tokens effectively", async function() {
+      var tokensOf = await tTimeshareMonth.tokensOf(addr1.address);
+      console.log("tokens of ", tokensOf);
+      //console.log("first elem is ", tokensOf[0]);
+      expect(tokensOf.length).to.equal(12);
+    })
   });
 
 

@@ -167,6 +167,34 @@ app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
   if (!ownerAddr) {
     res.json("Error: no owner specified in request to /ownedtimesharemonths api");
   }
+  var tokens = await nftimesharemonth.tokensOf(ownerAddr);
+  tokens = tokens.map(({tokenId, month, tokenURI}) => {
+    return {
+      token_id: tokenId,
+      month: monthName(month),
+      metadataURL: tokenURI,
+      req: axios.get(urlify(tokenURI))
+    }});
+  Promise.all(tokens.map((token) => token.req))
+    .then(function (results) {
+      console.log("all promises are finished", results[0]);
+      results.forEach( (metadata, index) => {
+        var media;
+        var name;
+        if (metadata.status === 200 && metadata.data) {
+          media = metadata.data.image || metadata.data.image_url || metadata.data.image_data || metadata.animation_url || metadata.youtube_url;
+          name  = metadata.data.name;
+        }
+        tokens[index].media = media ? media.toString() : null;
+        tokens[index].name = name.toString();
+      });
+      res.json({
+        nfts: tokens,
+        nextOffset: -1
+      });
+    });
+
+  /*
   var balance = await nftimesharemonth.balanceOf(ownerAddr);
   var tokens = [];
   for (let i = offset ; i < Math.min(balance, offset+21); i++ ) {
@@ -174,12 +202,7 @@ app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
     var month = await nftimesharemonth.month(token.toString());
     var url   = await nftimesharemonth.tokenURI(token.toString());
     var metadata = await axios.get(urlify(url));
-    var media;
-    var name;
-    if (metadata.status == 200 && metadata.data) {
-      media = metadata.data.image || metadata.data.image_url || metadata.data.image_data || metadata.animation_url || metadata.youtube_url;
-      name  = metadata.data.name;
-    }
+
     tokens.push({
       token_id: token.toString(),
       month: monthName(month),
@@ -191,7 +214,7 @@ app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
   res.json({
     nfts: tokens.slice(0,20),
     nextOffset: nextOffset
-  });
+  });*/
 });
 
 // for homescreen

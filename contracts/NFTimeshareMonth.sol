@@ -22,6 +22,12 @@ contract NFTimeshareMonth is Initializable, ERC721EnumerableUpgradeable, Ownable
       __Ownable_init();
     }
 
+    struct TimeshareMonthInfo {
+      uint256 tokenId;
+      uint8   month;
+      string  tokenURI;
+    }
+
     // return the int representation of the month of this token, 0-indexed
     // 0 = January; 11 = December
     function month(uint256 tokenId) public view returns (uint8) {
@@ -110,6 +116,21 @@ contract NFTimeshareMonth is Initializable, ERC721EnumerableUpgradeable, Ownable
             }
         }
         return true;
+    }
+
+    // convenience method to get all the necessary info about a user in one call
+    // TODO pagination
+    function tokensOf(address owner) public view virtual returns (TimeshareMonthInfo[] memory) {
+      uint256 ownerBalance = ERC721Upgradeable.balanceOf(owner);
+      TimeshareMonthInfo[] memory retval = new TimeshareMonthInfo[](ownerBalance);
+      for (uint256 i = 0; i < ownerBalance; i++) {
+        TimeshareMonthInfo memory idx;
+        idx.tokenId = tokenOfOwnerByIndex(owner, i);
+        idx.month = month(idx.tokenId);
+        idx.tokenURI = tokenURI(idx.tokenId);
+        retval[i] = idx;
+      }
+      return retval;
     }
 
     modifier onlyTimeshare {

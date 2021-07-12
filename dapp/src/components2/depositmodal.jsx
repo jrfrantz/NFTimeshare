@@ -11,8 +11,10 @@ export const DepositModal = (props) => {
     externalContract: nft.asset_contract.address,
     externalTokenId: nft.token_id
   }
-  const isPending = props.pendingDeposits.has(JSON.stringify(thisPendingTx));
 
+  const isPending = props.pendingDeposits.has(JSON.stringify(thisPendingTx));
+  console.log("Is it pending? ", isPending, JSON.stringify(thisPendingTx));
+  console.log("pendingdeposits is ", props.pendingDeposits);
   console.log("deposit modal media " , nft);
   console.log("in deposit modal with ", props.pendingDeposits);
 

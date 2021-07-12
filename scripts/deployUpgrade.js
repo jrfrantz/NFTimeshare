@@ -1,4 +1,5 @@
 const { ethers, upgrades } = require("hardhat");
+// these are set manually for now and correspond to rinkeby.
 const TOKEN_V1 = "0x6062cc344A7c4C036789892C447Ff32F0c051923";
 const NFTIMESHARE_V1 = "0xe4aA8DE6adea71Aab6db1dEB2a34afDCc19ce295";
 const NFTIMESHAREMONTH_V1 = "0x1909E978C0d4BC90D93bbD1CC367297d2bea1b2F";

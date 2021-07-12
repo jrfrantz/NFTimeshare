@@ -153,26 +153,23 @@ const GetStarted = () => {
     });
 
     await erc721Contract.setApprovalForAll(contractAddress.NFTimeshare, true);
+    // handle errors for setApprove rejections here.
     var tx = await nftimeshare.deposit(
       externalContract,
       externalTokenId,
       address,
       address
     );
-    console.log('tx submitted', pendingDeposit);
-    /*console.log('entering redeem'); // analog from redeem
-    var tx = await nftimeshare.redeem(parentTokenId, address);
-    console.log('tx submitted ', tx);
-    ethersProvider.waitForTransaction(tx.hash, 5);
-    console.log('wait for completed', tx);*/
-    tx.wait().then(() => {
-      console.log("tx finished", pendingDeposit);
-      setPendingDeposits((deposits) => {
-        deposits.delete(JSON.stringify(pendingDeposit));
-        return deposits;
-      });
-    });
+    // handle deposit errors here
 
+    console.log('tx submitted', pendingDeposit);
+    ethersProvider.waitForTransaction(tx.hash, 5);
+    console.log('waitfor completed', tx);
+
+    setPendingDeposits((deposits) => {
+      deposits.delete(JSON.stringify(pendingDeposit));
+      return deposits;
+    });
   }
 
   // should be triggered when someone presses redeem in the modal on any timesharemonth
