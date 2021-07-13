@@ -60,6 +60,7 @@ contract NFTimeshare is Initializable, ERC721EnumerableUpgradeable, ERC721Holder
     // given an an NFT (contract + tokenId), wrap it and mint it into timeshares.
     // this contract must be approved to operate it. _to must be able to receive erc721s.
     function deposit(address _underlying, uint256 _underlyingTokenId, address _from, address _to) public needsTimeshareMonths {
+        require(_underlying != address(_NFTimeshareMonths), "Deposit: Cant make timeshares out of timeshares");
         _tokenIds.increment();
         uint256 newTokenId = _tokenIds.current();
 

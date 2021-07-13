@@ -13,8 +13,9 @@ import { Depositable } from '../components2/depositable'
 import { DepositModal } from '../components2/depositmodal'
 import { RedeemModal } from '../components2/redeemmodal'
 import ERC721abi from "../contracts/ERC721abi.json"
-import { Modal } from 'react-bootstrap'
+import { Modal, Toast, Alert } from 'react-bootstrap'
 import { Credits } from '../components2/credits'
+import {TransactionAlerts } from '../components2/transactionalerts'
 
 const GetStarted = () => {
   const [address, setAddress] = useState("");
@@ -32,10 +33,14 @@ const GetStarted = () => {
   const [ownedNFTsOffset, setOwnedNFTsOffset] = useState(0);
   const [isLoadingOwnedNFTs, setLoadingOwnedNFTs] = useState(false);
 
+  // nft to show in modal
   const [selectedNFT, setSelectedNFT] = useState(null);
-  const [pendingDeposits, setPendingDeposits] = useState(new Set());
-  const [pendingRedemptions, setPendingRedemptions] = useState(new Set());
-  // TODO change the redemptions to a JSON and useEffect to monitor for changes.
+  // in-progress deposit and redeem actions
+  const [pendingDeposits, setPendingDeposits] = useState([]);
+  const [pendingRedemptions, setPendingRedemptions] = useState([]);
+  // txns that are in-progress or recently completed. {hash: status,}
+  const [sentTxns, setSentTxns] = useState([])
+
 
   // get address
   useEffect(() => {
@@ -130,47 +135,109 @@ const GetStarted = () => {
 
   const handleCloseModal = () => {
     setSelectedNFT(null);
+    // clear back out all the pending deposits probably
+    // add an input of the nft so that hte modal can pass the info about which to remove
+    // maybe just clear it out if the state was error or
   }
+  // TODO figure out toasts on
 
   // should be triggered when someone presses Lets do it the modal
   async function confirmDepositNft(externalContract, externalTokenId) {
     console.log("depositing");
     console.log("contract, token: ", externalContract, externalTokenId);
     console.log(new ethers.providers.Web3Provider(window.ethereum).getSigner(0));
-    let erc721Contract = new ethers.Contract(
-      externalContract,
-      ERC721abi.interface,
-      new ethers.providers.Web3Provider(window.ethereum).getSigner(0)
-    );
 
-    const pendingDeposit = {
-      externalContract: externalContract,
-      externalTokenId: externalTokenId
+    var status = "PENDING";
+    setPendingDeposits((deposits) => {
+      return [
+        ...deposits,
+        {
+          contract: externalContract.toLowerCase(),
+          tokenId:  externalTokenId.toLowerCase(),
+          status: status
+        }
+      ]
+    });
+    try {
+      let erc721Contract = new ethers.Contract(
+        externalContract,
+        ERC721abi.interface,
+        new ethers.providers.Web3Provider(window.ethereum).getSigner(0)
+      );
+      await erc721Contract.setApprovalForAll(contractAddress.NFTimeshare, true);
+
+      // handle errors for setApprove rejections here.
+      var tx = await nftimeshare.deposit(
+        externalContract,
+        externalTokenId,
+        address,
+        address
+      );
+      if (tx) {
+        setSentTxns((txns) => {
+          return [
+            ...txns,
+            {
+              txHash: tx.hash,
+              contract: externalContract,
+              tokenId: externalTokenId,
+              method: "DEPOSIT",
+              status: status
+            }
+          ]
+        });
+      }
+      ethersProvider.waitForTransaction(tx.hash, 5);
+      status = "SUCCESS";
+    } catch (error) {
+      status = "ERROR";
+    } finally {
+      setPendingDeposits((deposits) => {
+        var idx = deposits.findIndex(
+          (deposit) => deposit.contract === externalContract.toLowerCase && deposit.tokenId === externalTokenId.toLowerCase()
+        );
+        console.log("found at ", idx);
+        return [
+          ...deposits.splice(idx, 1),
+          {
+            contract: externalContract.toLowerCase(),
+            tokenId: externalTokenId.toLowerCase(),
+            status: status
+          }
+        ];
+      });
+      if (tx) {
+        setSentTxns((txns) => {
+          var idx = txns.findIndex(
+            (txn) => txn.txHash === tx.hash
+          );
+          console.log('found txn at ', idx, txns[idx]);
+          return [
+              ...txns.splice(idx, 1),
+              {
+                txHash: tx.hash,
+                contract: externalContract,
+                tokenId: externalTokenId,
+                method: "DEPOSIT",
+                status: status
+              }
+            ];
+          });
+        }
+      }
     }
-    setPendingDeposits((deposits) => {
-      deposits.add(JSON.stringify(pendingDeposit));
-      return deposits;
-    });
 
-    await erc721Contract.setApprovalForAll(contractAddress.NFTimeshare, true);
-    // handle errors for setApprove rejections here.
-    var tx = await nftimeshare.deposit(
-      externalContract,
-      externalTokenId,
-      address,
-      address
-    );
-    // handle deposit errors here
-
-    console.log('tx submitted', pendingDeposit);
-    ethersProvider.waitForTransaction(tx.hash, 5);
-    console.log('waitfor completed', tx);
-
-    setPendingDeposits((deposits) => {
-      deposits.delete(JSON.stringify(pendingDeposit));
-      return deposits;
-    });
-  }
+    function dismissTxnAlert(txn) {
+      setSentTxns((txns) => {
+        var idx = txns.findIndex((tx) => tx.txHash === txn.txHash);
+        if (idx > -1) {
+          return [...txns.splice(idx, 1)]
+        } else {
+          console.log("nothing. index is ", idx, txns[idx]);
+          return txns
+        }
+      })
+    }
 
   // should be triggered when someone presses redeem in the modal on any timesharemonth
   async function redeemNft(timeshareMonthTokenId) {
@@ -179,31 +246,80 @@ const GetStarted = () => {
     let siblingIds = await nftimesharemonth.getTimeshareMonths(parentTokenId);
     siblingIds = siblingIds.map((elem) => elem.toString().toLowerCase());
     console.log("Redemptions, sibs", )
+
+    var status = "PENDING";
+
     setPendingRedemptions((redemptions) => {
-      siblingIds.forEach((tokenId) => {
-        redemptions.add(tokenId)
-      })
-      return redemptions;
-    })
-    console.log('entering redeem');
-    var tx = await nftimeshare.redeem(parentTokenId, address);
-    console.log('tx submitted ', tx);
-    ethersProvider.waitForTransaction(tx.hash, 5);
-    console.log('wait for completed', tx);
-     // provider.waitForTransaction(hash, confirms?, timeout?)
-    console.log('submitted redeem', siblingIds);
-    console.log('finishd waiting for tx redeem', siblingIds);
-    setPendingRedemptions((redemptions) => {
-      siblingIds.forEach((tokenId) => {
-        redemptions.delete(tokenId);
-      });
-      return redemptions;
+      return [
+        ...redemptions,
+        ...siblingIds.map(
+          (tokenId) => {
+            return {
+              tokenId: tokenId,
+              status: status
+            };
+          })
+      ];
     });
+
+
+    try {
+      var tx = await nftimeshare.redeem(parentTokenId, address);
+      if (tx) {
+        setSentTxns((txns) => {
+          return [
+            ...txns,
+            {
+              txHash: tx.hash,
+              method: "REDEEM",
+              status: status
+            }
+          ]
+        })
+      }
+      ethersProvider.waitForTransaction(tx.hash, 5);
+      status = "SUCCESS";
+    } catch (error) {
+      console.log(error);
+      status = "ERROR";
+    } finally {
+      setPendingRedemptions((redemptions) => {
+        var filtered = redemptions.filter(
+          (redemption) => siblingIds.includes(redemption.TokenId)
+        );
+        return [
+          ...filtered,
+          ...siblingIds.map(
+            (tokenId) => {
+              return {
+                tokenId: tokenId,
+                status: status
+              }
+            })
+        ];
+      });
+      setSentTxns((txns) => {
+        var idx = txns.findIndex(
+          (txn) => txn.txHash === tx.hash
+        );
+        console.log('found txn at ', idx, txns[idx]);
+        return [
+          ...txns.splice(idx,1),
+          {
+            txHash: tx.hash,
+            method: "REDEEM",
+            status: status
+          }
+        ]
+      })
+    }
+
   }
   console.log("entering render with ", pendingDeposits, pendingRedemptions);
   return (
     <div>
       <DepositRedeemExplainer address={address} connectFunc={()=>connectWallet()} />
+      <TransactionAlerts txnAlerts={sentTxns} dismissFunc={dismissTxnAlert}/>
       <Depositable isLoading={isLoadingOwnedNFTs}
         nfts={ownedNFTs} onClickDeposit={onClickDeposit}
         loadMoreFunc={loadOwnedNFTs} hasMore={ownedNFTsOffset}/>
@@ -216,12 +332,12 @@ const GetStarted = () => {
         confirmDepositFunc={confirmDepositNft}
         pendingDeposits={pendingDeposits}/>
       <RedeemModal nftInfo={selectedNFT}
-      handleCloseFunc={handleCloseModal}
-      confirmRedeemFunc={redeemNft}
-      pendingRedemptions={pendingRedemptions}/>
-    <Credits />
-  </div>
-)
+        handleCloseFunc={handleCloseModal}
+        confirmRedeemFunc={redeemNft}
+        pendingRedemptions={pendingRedemptions}/>
+      <Credits />
+    </div>
+  )
 }
 
 /*

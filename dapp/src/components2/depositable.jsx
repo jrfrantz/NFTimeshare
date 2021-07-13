@@ -1,7 +1,13 @@
-import { Card, CardColumns, CardDeck, Badge, Button, Spinner } from 'react-bootstrap'
+import { Card, CardColumns, CardDeck, Badge, Button, Spinner, Link } from 'react-bootstrap'
 export const Depositable = (props) => {
   if (!props.nfts) {
     return null;
+  }
+
+  if (!props.nfts.length && props.hasMore < 0) {
+    return (
+      <p>Opensea API didn't return any NFTs for your address.</p>
+    )
   }
 
   // populated by setOwnedNFTs endpoint (OWNED_ASSETS_API);

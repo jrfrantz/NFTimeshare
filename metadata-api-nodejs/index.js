@@ -132,11 +132,12 @@ app.get('/api/ownednfts/:owner/:offset?', async function (req, res) {
 
       var assets = response.data.assets;
       const nextOffset = assets.length > 20 ? offset + 20 : -1;
-
+      console.log("opensea says", assets.length);
       assets = assets.filter((nft) =>
         nft.asset_contract.address.toLowerCase() !==
         contractAddress.NFTimeshareMonth.toLowerCase()
       );
+      console.log('after filter', assets.length);
       assets = assets.map(function (nft)  {
         nft.name = nft.name  || `Token ${nft.token_id} from contract at ${nft.asset_contract.address}`;
         //nft.media = nft.media || nft.image_url || nft.image || nft.image_data || nft.animation_url || nft.youtube_url;
@@ -144,7 +145,7 @@ app.get('/api/ownednfts/:owner/:offset?', async function (req, res) {
         nft.external_contract = nft.asset_contract.address
         return nft;
       });
-
+      console.log('after second map', assets.length);
       res.json({
         nfts: assets.slice(0,20),
         nextOffset: nextOffset
@@ -170,14 +171,13 @@ app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
   var tokens = await nftimesharemonth.tokensOf(ownerAddr);
   tokens = tokens.map(({tokenId, month, tokenURI}) => {
     return {
-      token_id: tokenId,
+      token_id: tokenId.toString(),
       month: monthName(month),
       metadataURL: tokenURI,
       req: axios.get(urlify(tokenURI))
     }});
   Promise.all(tokens.map((token) => token.req))
     .then(function (results) {
-      console.log("all promises are finished", results[0]);
       results.forEach( (metadata, index) => {
         var media;
         var name;

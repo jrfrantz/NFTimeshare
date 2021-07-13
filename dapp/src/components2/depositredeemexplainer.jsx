@@ -6,9 +6,8 @@ export const DepositRedeemExplainer = (props) => {
     return (
         <Jumbotron fluid>
           <Container>
-            <h1>
-                Deposit or Redeem Timeshares
-            </h1>
+            <h1>Deposit or Redeem Timeshares<small>
+              {' '}<Badge variant='warning' size='sm'>BETA</Badge></small></h1>
             <p>
                 Deposit any ERC721 token to receive 12 newly-minted NFTs in return
                 -- one for each month of the year. Each NFT has a different month

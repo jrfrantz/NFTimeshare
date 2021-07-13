@@ -229,6 +229,13 @@ describe("NFTimeshare and NFTimeshareMonths contract", function () {
 
       expect(await addr2TimeshareMonth.balanceOf(addr2.address)).to.equal(12);
     });
+    it("Can't make a timeshare out of a timeshare", async function() {
+      expect(tTimeshare.deposit(tTimeshareMonth.address,
+                                monthTokenIds[0],
+                                addr1.address,
+                                addr1.address
+                              )).to.be.revertedWith("Deposit: Cant make timeshares out of timeshares");
+    });
   });
 
   describe("ERC721 TimeshareMonths", function() {
@@ -351,8 +358,6 @@ describe("NFTimeshare and NFTimeshareMonths contract", function () {
     });
     it("Should enumerate all tokens effectively", async function() {
       var tokensOf = await tTimeshareMonth.tokensOf(addr1.address);
-      console.log("tokens of ", tokensOf);
-      //console.log("first elem is ", tokensOf[0]);
       expect(tokensOf.length).to.equal(12);
     })
   });
