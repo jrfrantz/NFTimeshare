@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=Mr+Dafoe&family=Rock+Salt&display=swap');
+
+.hero {
+  background-image: url(../assets/lighthouse.png);
+  background-color: #cccccc; /* Used if the image is unavailable */
+  height: 500px; /* You must set a specified height */
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: cover; /* Resize the background image to cover the entire container */
+
+  margin-bottom: 0 !important;
+}
+
+.site-cta .row {
+  justify-content: center;
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+.pitch-subtitle {
+  /* 1 pixel black shadow to left, top, right and bottom */
+  text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+  font-family: sans; color: white;
+}
+
+.beta-badge {
+  line-height: normal
+
+}
+
+.topline-header {
+  font-family: 'Rock Salt';
+  font-size: 10rem;
+  color: #000;
+  text-shadow:
+    0 0 7px #fff,
+    0 0 10px #fff,
+    0 0 21px #fff,
+    0 0 42px #ff2800,
+    0 0 82px #ff2800,
+    0 0 92px #ff2800,
+    0 0 102px #ff2800,
+    0 0 151px #ff2800;
+}
