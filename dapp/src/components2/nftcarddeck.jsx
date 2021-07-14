@@ -14,19 +14,33 @@ import '../css/nftcarddeck.css'
 
 // props should be {nfts: Array[media: url, name: str, month:str, tokenId: int]}
 export const NFTCardDeck = (props) => {
-  if (!props.nfts || !Object.keys(props.nfts).length) {
-    console.log("provided empty nft");
-    return (
-      <Container>
-        <p>Loading timeshares</p>
-        <Spinner animation="border" />
-      </Container>
-    );
+
+  function getLoadingBar() {
+    if (props.isLoading) {
+      // show spinner
+      console.log('showing spinner');
+      return (
+        <Spinner animation='border' variant='secondary'
+          size='lg' role='status' />
+      )
+    } else if (props.hasMore) {
+      return (
+        <Button className='btn-block' variant='outline-secondary'
+          onClick={props.loadMoreFunc}>
+          Load more
+        </Button>
+      )
+    } else if (!props.nfts.length) {
+      // opensea isn't returning any timeshares
+
+    }
   }
 
+
   console.log("props are", props.nfts);
+  console.log("and offset is ", props.hasMore)
   return (
-    <Container fluid>
+    <Container xl className='mb-3'>
       <Row className='my-2 mx-1'>
       <h3> Browse Timeshares </h3>
       </Row>
@@ -58,6 +72,13 @@ export const NFTCardDeck = (props) => {
             </Col>
         )})}
       </Row>
+
+      <Row className='mx-2'>
+        <Col className='d-flex justify-content-center'>
+          {getLoadingBar()}
+        </Col>
+      </Row>
+
     </Container>
   );
 }

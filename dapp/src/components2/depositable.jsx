@@ -1,4 +1,5 @@
 import { Card, CardColumns, CardDeck, Badge, Button, Spinner, Link } from 'react-bootstrap'
+import media_not_found from '../assets/NFT_NO_MEDIA.jpg'
 export const Depositable = (props) => {
   if (!props.nfts) {
     return null;
@@ -21,7 +22,7 @@ export const Depositable = (props) => {
                 <p>{nft.name} test</p>
               </Card.Title>
             <Card.Body>
-              <Card.Img variant="top" src={nft.media} height='64px' width='64px'/>
+              <Card.Img variant="top" src={nft.media ? nft.media : media_not_found} height='64px' width='64px'/>
             </Card.Body>
             <Card.Footer>
             <Button onClick={() => props.onClickDeposit(nft)}>

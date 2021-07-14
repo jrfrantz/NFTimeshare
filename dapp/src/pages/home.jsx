@@ -34,13 +34,14 @@ const Home = () => {
     axios.get(ALL_TIMESHARES_API).then(function (response) {
       if (response.status != 200 || !response.data) {
         console.log("Bad response from server", response);
-        return;
       }
       setPublicTimeshares((oldtimeshares) => [...oldtimeshares, ...response.data.nfts]);
       setPublicTimesharesOffset(response.data.nextOffset);
-      setIsLoading(false);
+
     }).catch(function (error) {
       console.error(error);
+    }).finally(() => {
+      setIsLoading(false);
     })
   }
 
@@ -79,10 +80,8 @@ const Home = () => {
       <TimeshareJumbotron />
       <HowItWorks />
     <hr />
-    <NFTCardDeck nfts={publicTimeshares} loadingState={isLoading} />
-    <Button variant='outline-secondary' onClick={loadMoreTimeshareMonths}>Load more</Button>
-      {false && testNFT && <Button onClick={() => connectWallet()}>CNECT NFT</Button>}
-      {false && testNFT && <Button onClick={() => testNFT.awardTestNFT()}>Award Test NFT</Button>}
+  <NFTCardDeck nfts={publicTimeshares} isLoading={isLoading}
+    loadMoreFunc={loadMoreTimeshareMonths} hasMore={publicTimesharesOffset > 0}/>
     <Credits />
     </div>
   )

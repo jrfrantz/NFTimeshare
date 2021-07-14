@@ -15,6 +15,7 @@
   /* 1 pixel black shadow to left, top, right and bottom */
   text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
   /*font-family: 'Mr Dafoe';*/ color: white;
+  display:inline;
 }
 
 .topline-header {
@@ -40,9 +41,14 @@
 }
 
 .site-cta h5 {
-  display: inline-block;
+  display: inline;
+}
+
+.site-cta h1 {
+  text-align: center;
 }
 
 .beta-badge {
-  line-height: 1rem;
+  line-height: 1em;
+  display: inline;
 }

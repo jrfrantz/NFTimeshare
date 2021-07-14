@@ -12,12 +12,13 @@ export const TimeshareJumbotron = (props) => {
           <h1 >NFT Timeshares</h1>
         </Row>
         <Row >
-          <span className='d-flex align-items-center'>
-            <h5 className='pitch-subtitle mb-0'>
-              Own an entire NFT -- for a month each year.
-            </h5>
-            <Badge variant='warning' className='beta-badge ml-2 py-1 vertical-align-middle'>BETA</Badge>
-          </span>
+          <Col>
+              <h5 className='pitch-subtitle mb-0'>
+                Own an entire NFT -- for a month each year.
+              </h5>
+              <Badge variant='dark' pill
+                className='beta-badge ml-1 py-1 vertical-align-text-top'>BETA</Badge>
+          </Col>
         </Row>
         <Row >
           <Col className='d-flex justify-content-center'>
