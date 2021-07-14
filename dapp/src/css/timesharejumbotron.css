@@ -11,21 +11,10 @@
   margin-bottom: 0 !important;
 }
 
-.site-cta .row {
-  justify-content: center;
-  margin-top: 40px;
-  margin-bottom: 40px;
-}
-
 .pitch-subtitle {
   /* 1 pixel black shadow to left, top, right and bottom */
   text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
-  font-family: sans; color: white;
-}
-
-.beta-badge {
-  line-height: normal
-
+  /*font-family: 'Mr Dafoe';*/ color: white;
 }
 
 .topline-header {
@@ -41,4 +30,19 @@
     0 0 92px #ff2800,
     0 0 102px #ff2800,
     0 0 151px #ff2800;
+}
+
+.site-cta .row {
+  direction: flex;
+  justify-content: center;
+  margin-bottom: 3rem;
+
+}
+
+.site-cta h5 {
+  display: inline-block;
+}
+
+.beta-badge {
+  line-height: 1rem;
 }

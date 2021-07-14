@@ -10,28 +10,38 @@ export const HowItWorks = (props) => {
   // arrow left right
   // diagram 3 fill
   return (
-    <Container fluid>
-      <Row >
-        <Col lg>
-          <Gift className="cta-icon"/>
-           <h5>Any NFT can be converted into 12 timeshare NFTs -- one for each month.</h5>
-         </Col>
-        <Col lg>
-          <ArrowLeftRight className="cta-icon"/>
-          <h5>Timeshares can be bought, sold, and traded like any other NFTs.</h5>
-        </Col>
-        <Col lg>
-          <Diagram3Fill className="cta-icon"/>
-          <h5>You can always exchange back all 12 months to get your original NFT.</h5>
-        </Col>
-      </Row>
-      <Row className='get-started-button'>
-        <Link to="/getstarted">
-          <Button>
-            Deposit an NFT
-          </Button>
-        </Link>
-      </Row>
+    <Container className='pitch-bg pb-4' fluid>
+      <Container fluid>
+        <Row xs='1' md='3' className='explainer-row'>
+          <Col>
+              <div className='d-flex justify-content-center mb-2'>
+                <Gift className="cta-icon"/>
+              </div>
+            <h5>Any NFT can be converted into 12 timeshare NFTs -- one for each month.</h5>
+          </Col>
+          <Col>
+            <div className='d-flex justify-content-center mb-2'>
+              <ArrowLeftRight className="cta-icon"/>
+            </div>
+            <h5>Timeshares can be bought, sold, and traded like any other NFTs.</h5>
+          </Col>
+          <Col >
+            <div className='d-flex justify-content-center mb-2'>
+              <Diagram3Fill className="cta-icon"/>
+            </div>
+            <h5>You can always exchange back all 12 months to get your original NFT.</h5>
+          </Col>
+        </Row>
+        <Row>
+          <Col className='d-flex justify-content-center'>
+            <Link to="/getstarted">
+              <Button>
+                Deposit an NFT
+              </Button>
+            </Link>
+          </Col>
+        </Row>
+      </Container>
     </Container>
   );
 }

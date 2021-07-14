@@ -7,22 +7,26 @@ export const TimeshareJumbotron = (props) => {
   console.log(props);
   return (
     <Jumbotron className='hero' fluid>
-      <Container className='site-cta'>
-        <Row className='topline-header'>
-          <h1>NFT Timeshares</h1>
+      <Container className='site-cta mt-3'>
+        <Row className='topline-header '>
+          <h1 >NFT Timeshares</h1>
         </Row>
-        <Row className='subtitle-row'>
-            <h5 className='pitch-subtitle'>
+        <Row >
+          <span className='d-flex align-items-center'>
+            <h5 className='pitch-subtitle mb-0'>
               Own an entire NFT -- for a month each year.
             </h5>
-            {' '}<Badge variant='warning' className='beta-badge'>BETA</Badge>
+            <Badge variant='warning' className='beta-badge ml-2 py-1 vertical-align-middle'>BETA</Badge>
+          </span>
         </Row>
-        <Row>
+        <Row >
+          <Col className='d-flex justify-content-center'>
           <Link to='/getstarted'>
-            <Button>
+            <Button size='lg'>
               Get started
             </Button>
           </Link>
+          </Col>
         </Row>
       </Container>
     </Jumbotron>
