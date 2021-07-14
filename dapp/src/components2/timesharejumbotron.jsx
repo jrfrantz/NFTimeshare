@@ -11,13 +11,13 @@ export const TimeshareJumbotron = (props) => {
         <Row className='topline-header '>
           <h1 >NFT Timeshares</h1>
         </Row>
-        <Row >
-          <Col>
+        <Row className='justify-content-center'>
+          <Col md='auto'>
               <h5 className='pitch-subtitle mb-0'>
                 Own an entire NFT -- for a month each year.
               </h5>
               <Badge variant='dark' pill
-                className='beta-badge ml-1 py-1 vertical-align-text-top'>BETA</Badge>
+                className='beta-badge ml-1 py-1 '>BETA</Badge>
           </Col>
         </Row>
         <Row >
