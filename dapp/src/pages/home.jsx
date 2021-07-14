@@ -79,10 +79,10 @@ const Home = () => {
       <TimeshareJumbotron />
       <HowItWorks />
     <hr />
-  <NFTCardDeck nfts={publicTimeshares} loadingState={isLoading} />
-<Button variant='outline-secondary' onClick={loadMoreTimeshareMonths}>Load more</Button>
-    {false && testNFT && <Button onClick={() => connectWallet()}>CNECT NFT</Button>}
-    {false && testNFT && <Button onClick={() => testNFT.awardTestNFT()}>Award Test NFT</Button>}
+    <NFTCardDeck nfts={publicTimeshares} loadingState={isLoading} />
+    <Button variant='outline-secondary' onClick={loadMoreTimeshareMonths}>Load more</Button>
+      {false && testNFT && <Button onClick={() => connectWallet()}>CNECT NFT</Button>}
+      {false && testNFT && <Button onClick={() => testNFT.awardTestNFT()}>Award Test NFT</Button>}
     <Credits />
     </div>
   )

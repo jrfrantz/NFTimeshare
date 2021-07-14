@@ -77,7 +77,7 @@ app.get('/timesharemonth/:token_id', async function(req, res) {
       trait_type: "Parent Timeshare TokenId",
       value     : parentId.toString()
     });
-    underlyingMetadata.name = underlyingMetadata.name + " -- " + monthStr.toUpperCase();
+    underlyingMetadata.name = underlyingMetadata.name + " (" + monthStr + ")";
     underlyingMetadata.description = underlyingMetadata.description +
         "  This NFT represents ownership for the month of " + monthStr + ". "
         + "Learn more at www.nftimeshares.fun";
