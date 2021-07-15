@@ -340,13 +340,4 @@ const GetStarted = () => {
   )
 }
 
-/*
-<Modal modalState={modalState} closeModal={onCloseModal}
-        depositFunc={depositNft} redeemFunc={redeemNft}/>
-<Explainer />
-<ConnectWallet connectedWallet={address} connectFunc={() => connectWallet()}/>
-<Depositable nfts={getOwnedNFTData()}/>
-<Redeemable nfts={getTimeshareData()} />
-*/
-
 export default GetStarted

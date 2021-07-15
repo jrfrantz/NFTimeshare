@@ -1,4 +1,6 @@
-import { Card, CardColumns, CardDeck, Badge, Button, Spinner } from 'react-bootstrap'
+import { Card, CardColumns, Container, Row, Col, CardDeck, Badge, Button, Spinner } from 'react-bootstrap'
+import { CalendarMonth, Calendar3 } from 'react-bootstrap-icons'
+import '../css/nftcarddeck.css'
 export const Redeemable = (props) => {
   if (!props.nfts) {
     return null;
@@ -8,34 +10,48 @@ export const Redeemable = (props) => {
       <p>
         No Timeshares were found for your address. Deposit an NFT
         to make some!
-    </p>
+      </p>
     )
   }
-  return (
-    <div>
-      { !!props.nfts.length &&
-        <h6>
-          You can redeem the original underlying NFT if you own or operate
-        all 12 of its timeshares
+
+  function getHeading() {
+    if (!props.nfts.length) {
+      return null;
+    }
+    return (
+      <h6>
+        You can redeem the original underlying NFT if you own or operate
+      all 12 of its timeshares
       </h6>
-      }
-      <CardColumns>
+    )
+  }
+
+  return (
+    <Container xl className='mb-3'>
+      { getHeading() }
+      <Row className='mx-2'>
         {props.nfts.map((nft, i) => {
           return (
-            <Card style={{width: '256px'}} key={`deposit_card_${i}`}>
-              <Card.Img variant="top" src={nft.media} />
-            <Card.Body>
-              <Card.Title>
-                {nft.name}
-              </Card.Title>
-              <Button onClick={()=> props.onClickRedeem(nft)}>
-                Redeem
-              </Button>
-            </Card.Body>
-            </Card>
+            <Col md='6' lg='4' className='d-flex justify-content-center'>
+              <Card className='nft-card my-3' key={`deposit_card_${i}`}>
+                <Card.Header className='text-muted'>
+                  < Calendar3 /> {nft.month}
+                </Card.Header>
+                <Card.Img variant="top" src={nft.media} />
+              <Card.Title className='text-center mt-auto'>
+                  {nft.name}
+                </Card.Title>
+                <Card.Footer className='text-center'>
+                  <Button variant='outline-secondary'
+                    onClick={()=> props.onClickRedeem(nft)}>
+                    Redeem
+                  </Button>
+                </Card.Footer>
+              </Card>
+            </Col>
           )
         })}
-      </CardColumns>
+      </Row>
       {props.isLoading &&
         <div>
           <Spinner animation='outline'/>
@@ -47,6 +63,6 @@ export const Redeemable = (props) => {
           Load more
         </Button>
       }
-    </div>
+    </Container>
   )
 }

@@ -141,7 +141,7 @@ app.get('/api/ownednfts/:owner/:offset?', async function (req, res) {
       assets = assets.map(function (nft)  {
         nft.name = nft.name  || `Token ${nft.token_id} from contract at ${nft.asset_contract.address}`;
         //nft.media = nft.media || nft.image_url || nft.image || nft.image_data || nft.animation_url || nft.youtube_url;
-        nft.media = nft.image_url;
+        nft.media = nft.image_url; // TODO urlify?
         nft.external_contract = nft.asset_contract.address
         return nft;
       });
@@ -222,7 +222,8 @@ app.get('/api/alltimesharemonths/:offset?', async function (req, res) {
   const offset = req.params.offset ? parseInt(req.params.offset) : 0;
   const ALL_NFTIMESHARES_URL = `https://rinkeby-api.opensea.io/api/v1/assets?asset_contract_address=${contractAddress.NFTimeshareMonth.toLowerCase()}&order_by=token_id&order_direction=desc&offset=${offset}&limit=21`;
   console.log(ALL_NFTIMESHARES_URL);
-  axios.get(ALL_NFTIMESHARES_URL, OPENSEA_HEADER).then(function(response) {
+  const MOCK_FOUNDATION_URL = `https://api.opensea.io/api/v1/assets?asset_contract_address=0x3B3ee1931Dc30C1957379FAc9aba94D1C48a5405&order_direction=desc&offset=${offset}&limit=21`;
+  axios.get(MOCK_FOUNDATION_URL, OPENSEA_HEADER).then(function(response) {
     if (response.status !== 200) {
       res.json(response);
       return;
@@ -247,7 +248,7 @@ app.get('/api/alltimesharemonths/:offset?', async function (req, res) {
     });
     console.log("about to send json with ", assets, nextOffset);
     res.json({
-      nfts: assets,
+      nfts: assets.slice(0,20),
       nextOffset: nextOffset
     });
   }).catch((error) => {

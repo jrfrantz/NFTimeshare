@@ -32,7 +32,7 @@ export const HowItWorks = (props) => {
             <h5>You can always exchange back all 12 months to get your original NFT.</h5>
           </Col>
         </Row>
-        <Row>
+        <Row className='align-self-flex-end mt-3'>
           <Col className='d-flex justify-content-center'>
             <Link to="/getstarted">
               <Button>

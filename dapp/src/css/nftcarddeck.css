@@ -1,3 +1,11 @@
 .nft-card {
   width: 300px;
 }
+
+.nft-card-img {
+  object-fit: scale-down;
+}
+
+.deposit-nft-header {
+  flex-grow: 1;
+}

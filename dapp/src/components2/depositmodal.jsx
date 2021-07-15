@@ -56,7 +56,7 @@ export const DepositModal = (props) => {
           12 NFTs, one for each month.
       </Modal.Body>
       <Modal.Footer>
-        <Button
+        <Button className='btn-block'
           onClick={() => props.confirmDepositFunc(nft.asset_contract.address, nft.token_id)}
           {...getButtonProps(pendingStatus.status)}>
           {getButtonProps(pendingStatus.status).text}

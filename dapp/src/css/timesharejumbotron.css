@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Mr+Dafoe&family=Rock+Salt&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Mr+Dafoe&family=Rock+Salt&family=Roboto&display=swap');
 
 .hero {
   background-image: url(../assets/lighthouse.png);
@@ -14,7 +14,7 @@
 .pitch-subtitle {
   /* 1 pixel black shadow to left, top, right and bottom */
   text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
-  /*font-family: 'Mr Dafoe';*/ color: white;
+  font-family: 'Roboto'; color: white;
   display:inline;
 }
 
@@ -51,5 +51,4 @@
 .beta-badge {
   line-height: 1em;
   display: inline;
-  
 }

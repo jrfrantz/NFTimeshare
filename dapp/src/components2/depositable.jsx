@@ -1,5 +1,6 @@
-import { Card, CardColumns, CardDeck, Badge, Button, Spinner, Link } from 'react-bootstrap'
+import { Card, CardColumns, Container, CardDeck, Badge, Button, Spinner, Link, Row, Col } from 'react-bootstrap'
 import media_not_found from '../assets/NFT_NO_MEDIA.jpg'
+import '../css/nftcarddeck.css'
 export const Depositable = (props) => {
   if (!props.nfts) {
     return null;
@@ -11,28 +12,44 @@ export const Depositable = (props) => {
     )
   }
 
+  function getHeading() {
+    if (!props.nfts.length) {
+      return null;
+    }
+    return (
+      <Row className='my-2 mx-1'>
+        <h3> Deposit to make an NFTimeshare </h3>
+      </Row>
+    )
+  }
+
   // populated by setOwnedNFTs endpoint (OWNED_ASSETS_API);
   return (
-    <div>
-      <CardColumns>
+    <Container xl className='mb-3'>
+      { getHeading() }
+      <Row className='mx-2'>
         {props.nfts.map((nft, i) => {
           return (
-            <Card style={{width: '256px'}}key={`deposit_card_${i}`}>
-              <Card.Title>
-                <p>{nft.name} test</p>
-              </Card.Title>
-            <Card.Body>
-              <Card.Img variant="top" src={nft.media ? nft.media : media_not_found} height='64px' width='64px'/>
-            </Card.Body>
-            <Card.Footer>
-            <Button onClick={() => props.onClickDeposit(nft)}>
-              Deposit
-            </Button>
-            </Card.Footer>
-            </Card>
+            <Col md='6' lg='4' className='d-flex justify-content-center'>
+              <Card className='nft-card my-3' key={`deposit_card_${i}`}>
+                <Card.Header className='deposit-nft-header'>
+                  <Card.Title className='text-center'>
+                    {nft.name}
+                  </Card.Title>
+                </Card.Header>
+                <Card.Img className='nft-card-img' variant="top"
+                  src={nft.media ? nft.media : media_not_found}/>
+                <Card.Footer className='text-center mt-auto px-3 py-2'>
+                  <Button className='btn-block px-0'
+                    onClick={() => props.onClickDeposit(nft)}>
+                    Deposit
+                  </Button>
+              </Card.Footer>
+              </Card>
+            </Col>
           )
         })}
-      </CardColumns>
+      </Row>
       {props.isLoading &&
          <Spinner animation='border' variant='dark' /> }
       {props.hasMore > 0 && !props.isLoading &&
@@ -40,7 +57,7 @@ export const Depositable = (props) => {
           Load more
         </Button>
       }
-    </div>
+    </Container>
   )
 
 }
