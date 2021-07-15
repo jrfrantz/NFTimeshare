@@ -25,7 +25,7 @@ export const TimeshareJumbotron = (props) => {
         <Row >
           <Col className='d-flex justify-content-center'>
           <Link to='/getstarted'>
-            <Button size='lg'>
+            <Button size='lg' variant='warning' className='px-5 border'>
               Get started
             </Button>
           </Link>
