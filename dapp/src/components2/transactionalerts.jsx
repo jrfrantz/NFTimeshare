@@ -24,15 +24,15 @@ export const TransactionAlerts = (props) => {
     switch (txn.status) {
       case "PENDING":
         alertProps.status = "pending"
-        alertProps.variant = "info"
+        alertProps.bg = "info"
         break;
       case "SUCCESS":
         alertProps.status = "succeeded"
-        alertProps.variant = "success"
+        alertProps.bg = "success"
         break;
       case "ERROR":
         alertProps.status = "failed"
-        alertProps.variant = "danger"
+        alertProps.bg = "danger"
         break;
     }
     return alertProps
@@ -52,17 +52,21 @@ export const TransactionAlerts = (props) => {
         return (
           <Toast key={`txn_alert_${i}`} {...alertProps}
             onClose = {() => props.dismissFunc(txn)}>
-            <Toast.Header>
-              {alertProps.method + ' ' + alertProps.status}
+            <Toast.Header className='me-auto'>
+              <strong>
+                {alertProps.method + ' ' + alertProps.status}
+              </strong>
             </Toast.Header>
-            Your transaction has been sent to the Ethereum network and can be viewed
-            {' '}
-            <a href={alertProps.etherscan_url}
-              target="_blank" rel="noopener noreferrer">
-              on etherscan.
-            </a>
-            {' '}
-            Note that it can take some time to be reflected on nftimeshares.fun
+            <Toast.Body>
+              Your transaction has been sent to the Ethereum network and can be viewed
+              {' '}
+              <a href={alertProps.etherscan_url}
+                target="_blank" rel="noopener noreferrer">
+                on etherscan.
+              </a>
+              {' '}
+              Note that it can take some time to be reflected on nftimeshares.fun
+            </Toast.Body>
           </Toast>
         )
       })

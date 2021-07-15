@@ -37,8 +37,8 @@ export const Redeemable = (props) => {
                 <Card.Header className='text-muted'>
                   < Calendar3 /> {nft.month}
                 </Card.Header>
-                <Card.Img variant="top" src={nft.media} />
-              <Card.Title className='text-center mt-auto'>
+                <Card.Img variant="top" className='nft-card-img' src={nft.media} />
+                <Card.Title className='text-center mt-auto'>
                   {nft.name}
                 </Card.Title>
                 <Card.Footer className='text-center'>
