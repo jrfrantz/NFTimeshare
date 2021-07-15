@@ -30,9 +30,9 @@ export const DepositRedeemExplainer = (props) => {
               <Col>
                 <p>
                     Deposit any ERC721 token to receive 12 newly-minted NFTs in return
-                    -- one for each month of the year. Each NFT has a different month
+                    — one for each month of the year. Each NFT has a different month
                     associated with it on the Ethereum blockchain. These don't "expire"
-                    after a year -- you own the asset fully for the same month each year.
+                    after a year — you own the asset fully for the same month each year.
                 </p>
                 <p>
                     You can always redeem the underlying asset by giving back all

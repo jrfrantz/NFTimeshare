@@ -17,7 +17,7 @@ export const HowItWorks = (props) => {
               <div className='d-flex justify-content-center mb-2'>
                 <Gift className="cta-icon"/>
               </div>
-            <h5>Any NFT can be converted into 12 timeshare NFTs -- one for each month.</h5>
+            <h5>Any NFT can be converted into 12 timeshare NFTs — one for each month.</h5>
           </Col>
           <Col>
             <div className='d-flex justify-content-center mb-2'>

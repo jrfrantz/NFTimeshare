@@ -7,6 +7,7 @@ import { NFTCardDeck } from '../components2/nftcarddeck';
 import { TimeshareJumbotron } from "../components2/timesharejumbotron";
 import { HowItWorks } from "../components2/howitworks";
 import { Credits } from "../components2/credits";
+import { ChooseMonth } from '../components2/choosemonth'
 import axios from 'axios'
 
 
@@ -77,6 +78,7 @@ const Home = () => {
 
   return (
     <div>
+      <ChooseMonth />
       <TimeshareJumbotron />
       <HowItWorks />
     <hr />

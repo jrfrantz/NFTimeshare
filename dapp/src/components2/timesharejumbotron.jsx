@@ -14,7 +14,7 @@ export const TimeshareJumbotron = (props) => {
         <Row className='justify-content-center mx-2'>
           <Col md='auto'>
               <h5 className='pitch-subtitle mb-0'>
-                Own an entire NFT -- for a month each year.
+                Own an entire NFT — for a month each year.
               </h5>
               <Badge variant='dark' pill
                 className='beta-badge ml-1 py-1 '>Beta</Badge>
