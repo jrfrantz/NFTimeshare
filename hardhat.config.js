@@ -1,4 +1,5 @@
 require("@nomiclabs/hardhat-waffle");
+require("@nomiclabs/hardhat-etherscan");
 
 // The next line is part of the sample project, you don't need it in your
 // project. It imports a Hardhat task definition, that can be used for
@@ -7,7 +8,7 @@ require("./tasks/faucet");
 require("@nomiclabs/hardhat-ethers");
 require('@openzeppelin/hardhat-upgrades');
 
-const { alchemyApiKey, mnemonic } = require('./secrets.json');
+const { alchemyApiKey, mnemonic, ETHERSCAN_API_KEY } = require('./secrets.json');
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -26,5 +27,8 @@ module.exports = {
        accounts: {mnemonic: mnemonic}
      }
   },
+  etherscan: {
+    apiKey: ETHERSCAN_API_KEY
+  }
 
 };
