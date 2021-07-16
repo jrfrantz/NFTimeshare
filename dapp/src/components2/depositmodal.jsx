@@ -46,9 +46,9 @@ export const DepositModal = (props) => {
     }
   }
   return (
-    <Modal show={nft != null} onHide={props.handleCloseFunc}>
+    <Modal show={nft != null} onHide={props.handleCloseFunc} background={pendingStatus.status === "PENDING" ? "static" : ""}>
       <Modal.Header closeButton>
-        <Modal.Title>Make Timeshare</Modal.Title>
+        <Modal.Title>Make a Timeshare</Modal.Title>
       </Modal.Header>
       <Image src={nft.media} width='100%'/>
       <Modal.Body>

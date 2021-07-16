@@ -111,6 +111,12 @@ app.get('/timeshare/:token_id', async function(req, res) {
     trait_type: "Timeshare Months",
     value      : timeshareMonthIds.map(id => {return id.toString()}).join(', ')
   })
+
+  underlyingMetadata.name = underlyingMetadata.name + " [Wrapped Timeshare]";
+  underlyingMetadata.description = underlyingMetadata.description +
+      " This NFT is wrapped under timeshare. "
+      + "Learn more at www.nftimeshares.fun";
+
   res.json(underlyingMetadata);
 })
 
@@ -217,6 +223,38 @@ app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
     nextOffset: nextOffset
   });*/
 });
+
+  app.get('/api/alltimeshares/:offset?', async function (req, res) {
+    const offset = req.params.offset ? parseInt(req.params.offset) : 0;
+    var totalSupply = await nftimeshare.totalSupply();
+    console.log('total supply is ', totalSupply.toString());
+    var allTimeshareReqs = [...new Array(totalSupply).keys()].map((_, i) => {
+      console.log('in loop number ', i);
+      var thisTokenId;
+      var thisTokenURI;
+      return nftimeshare.tokenByIndex(i)
+      .then(function (tokenId) {
+        console.log("tokenid is", tokenId.toString());
+        thisTokenId = tokenId.toString();
+        return nftimeshare.tokenURI(thisTokenId)
+      }).then(function (tokenURI) {
+        console.log('tokenuri is ', tokenURI);
+        thisTokenURI = tokenURI.toString();
+        return {
+          tokenId: thisTokenId,
+          tokenURI: thisTokenURI
+        }
+      });
+    });
+    console.log(allTimeshareReqs);
+    console.log(allTimeshareReqs.lenth)
+    Promise.all(allTimeshareReqs).then(function (tokens) {
+      res.json({
+        nfts: tokens,
+        nextOffset: -1
+      })
+    });
+  });
 
 // for homescreen
 app.get('/api/alltimesharemonths/:offset?', async function (req, res) {

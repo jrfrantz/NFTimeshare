@@ -7,10 +7,13 @@ export const Redeemable = (props) => {
   }
   if (!props.nfts.length && props.hasMore < 0) {
     return (
-      <p>
-        No Timeshares were found for your address. Deposit an NFT
-        to make some!
-      </p>
+      <Container><Row><Col>
+        <p>
+          No Timeshares were found for your address. Deposit an NFT
+          to make some!
+        </p>
+      </Col></Row></Container>
+
     )
   }
 
@@ -19,10 +22,12 @@ export const Redeemable = (props) => {
       return null;
     }
     return (
+      <Row><Col>
       <h6>
         You can redeem the original underlying NFT if you own or operate
       all 12 of its timeshares
       </h6>
+      </Col></Row>
     )
   }
 
