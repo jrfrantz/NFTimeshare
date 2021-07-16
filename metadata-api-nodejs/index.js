@@ -11,6 +11,7 @@ const axios = require('axios');
 const PORT = process.env.PORT || 5000
 const alchemyKeyOnly = process.env.ALCHEMY_KEY || require('../secrets.json').alchemyKeyOnly;
 const OPENSEA_API_KEY = process.env.OPENSEA_API_KEY || require('../secrets.json').OPENSEA_API_KEY;
+const PROD_NFTIMESHARES_WALLET_ADDR = process.env.PROD_NFTIMESHARES_WALLET_ADDR || require('../secrets.json').PROD_NFTIMESHARES_WALLET_ADDR
 const NFTimeshareArtifact      = require("./src/contracts/NFTimeshare.json");
 const NFTimeshareMonthArtifact = require("./src/contracts/NFTimeshareMonth.json");
 const contractAddress          = require("./src/contracts/contract-address.json");
@@ -243,6 +244,7 @@ app.get('/api/alltimesharemonths/:offset?', async function (req, res) {
         var monthTrait = nft.traits.find((trait) => {
           return trait.trait_type === "Month"
         });
+        nft.permalink = nft.permalink ? (nft.permalink+`?ref=${PROD_NFTIMESHARES_WALLET_ADDR}`) : ""
         nft.month = monthTrait ? monthTrait.value : "";
         return nft;
     });

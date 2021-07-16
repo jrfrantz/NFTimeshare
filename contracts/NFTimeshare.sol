@@ -51,10 +51,12 @@ contract NFTimeshare is Initializable, ERC721EnumerableUpgradeable, ERC721Holder
 
     //constructor() ERC721("Timeshare", "TSBO") {}
     function initialize() public initializer {
+      __Context_init_unchained();
+      __ERC165_init_unchained();
+      __Ownable_init_unchained();
       __ERC721_init("Timeshare", "SHARE");
-      __ERC721Enumerable_init();
-      __ERC721Holder_init();
-      __Ownable_init();
+      __ERC721Enumerable_init_unchained();
+      __ERC721Holder_init_unchained();
     }
 
     // given an an NFT (contract + tokenId), wrap it and mint it into timeshares.
@@ -63,11 +65,12 @@ contract NFTimeshare is Initializable, ERC721EnumerableUpgradeable, ERC721Holder
         require(_underlying != address(_NFTimeshareMonths), "Deposit: Cant make timeshares out of timeshares");
         _tokenIds.increment();
         uint256 newTokenId = _tokenIds.current();
-
+        _safeMint(address(this), newTokenId);
         _tokenIdForUnderlying[_underlying][_underlyingTokenId] = newTokenId;
         _wrappedNFTs[newTokenId] = UnderlyingNFT(_underlying, _underlyingTokenId);
 
         _NFTimeshareMonths.makeTimesharesFor(newTokenId, _to);
+
         IERC721Upgradeable(_underlying).safeTransferFrom(_from, address(this), _underlyingTokenId);
         emit Deposit(_from, msg.sender, _to, _underlying, _underlyingTokenId, newTokenId);
     }
@@ -82,8 +85,10 @@ contract NFTimeshare is Initializable, ERC721EnumerableUpgradeable, ERC721Holder
         delete _tokenIdForUnderlying[underlyingNFT._contractAddr][underlyingNFT._tokenId];
         delete _wrappedNFTs[tokenId];
 
+
         _NFTimeshareMonths.burnTimeshareMonthsFor(msg.sender, tokenId);
         IERC721Upgradeable(underlyingNFT._contractAddr).safeTransferFrom(address(this), _to, underlyingNFT._tokenId);
+        _burn(tokenId);
         emit Redeem(msg.sender, _to, underlyingNFT._contractAddr, underlyingNFT._tokenId, tokenId);
 
     }

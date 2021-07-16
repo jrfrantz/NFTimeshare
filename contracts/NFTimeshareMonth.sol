@@ -17,9 +17,9 @@ contract NFTimeshareMonth is Initializable, ERC721EnumerableUpgradeable, Ownable
     mapping (uint256 => uint256[12]) private _monthsForTimeshare;
 
     function initialize() public initializer {
-      __ERC721_init("TimeshareMonth", "Time");
       __ERC721Enumerable_init();
       __Ownable_init();
+      __ERC721_init_unchained("TimeshareMonth", "TIME");
     }
 
     struct TimeshareMonthInfo {

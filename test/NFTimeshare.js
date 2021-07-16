@@ -58,6 +58,7 @@ describe("NFTimeshare and NFTimeshareMonths contract", function () {
   let addrs;
   let externalTokenId;
 
+  // this code should only run once, so it's before instead of beforeEach()
   beforeEach(async function () {
     // Get the ContractFactory and Signers here.
     NFTimeshare      = await ethers.getContractFactory("NFTimeshare");
@@ -129,7 +130,7 @@ describe("NFTimeshare and NFTimeshareMonths contract", function () {
     let timeshareTokenId;
     let monthTokenIds;
     beforeEach(async function() {
-      await tExternalNFT.approve(tTimeshare.address, 1);
+      await tExternalNFT.approve(tTimeshare.address, externalTokenId);
       await tTimeshare.deposit(
         tExternalNFT.address,
         externalTokenId,
@@ -142,6 +143,15 @@ describe("NFTimeshare and NFTimeshareMonths contract", function () {
       );
       monthTokenIds = await tTimeshareMonth.getTimeshareMonths(timeshareTokenId);
     });
+
+    afterEach(async function() {
+      // redeem all the timeshares
+      // send the NFT back to addr1
+      /*await tTimeshare.redeem(
+        timeshareTokenId,
+        addr1.address
+      )*/
+    })
 
     it("Should make 12 monthTokens", async function() {
       expect(monthTokenIds.length).to.equal(12);
