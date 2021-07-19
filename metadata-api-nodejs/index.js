@@ -231,7 +231,7 @@ app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
     const ALL_NFTIMESHARES_URL = `https://rinkeby-api.opensea.io/api/v1/assets?asset_contract_address=${contractAddress.NFTimeshare.toLowerCase()}&order_by=token_id&order_direction=desc&offset=${offset}&limit=21`;
     console.log(ALL_NFTIMESHARES_URL);
     const MOCK_FOUNDATION_URL = `https://api.opensea.io/api/v1/assets?asset_contract_address=0x3B3ee1931Dc30C1957379FAc9aba94D1C48a5405&order_direction=desc&offset=${offset}&limit=21`;
-    axios.get(ALL_NFTIMESHARES_URL, OPENSEA_HEADER).then(function(response) {
+    axios.get(MOCK_FOUNDATION_URL, OPENSEA_HEADER).then(function(response) {
       if (response.status !== 200) {
         res.json(response);
         return;
