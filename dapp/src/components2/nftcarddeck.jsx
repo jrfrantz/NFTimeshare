@@ -63,9 +63,8 @@ export const NFTCardDeck = (props) => {
                 </Card.Title>
                 <Card.Footer className='text-center'>
                   <Button variant="outline-secondary"
-                    href={nft.permalink}
-                    target="_blank" rel="noopener noreferrer">
-                    Buy on Opensea
+                    onClick={() => props.selectionFunc(nft)}>
+                    Choose Time
                   </Button>
                 </Card.Footer>
               </Card>
@@ -82,3 +81,12 @@ export const NFTCardDeck = (props) => {
     </Container>
   );
 }
+
+
+/*
+<Button variant="outline-secondary"
+  href={nft.permalink}
+  target="_blank" rel="noopener noreferrer">
+  Choose Time
+</Button>
+*/

@@ -231,7 +231,7 @@ app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
     const ALL_NFTIMESHARES_URL = `https://rinkeby-api.opensea.io/api/v1/assets?asset_contract_address=${contractAddress.NFTimeshare.toLowerCase()}&order_by=token_id&order_direction=desc&offset=${offset}&limit=21`;
     console.log(ALL_NFTIMESHARES_URL);
     const MOCK_FOUNDATION_URL = `https://api.opensea.io/api/v1/assets?asset_contract_address=0x3B3ee1931Dc30C1957379FAc9aba94D1C48a5405&order_direction=desc&offset=${offset}&limit=21`;
-    axios.get(MOCK_FOUNDATION_URL, OPENSEA_HEADER).then(function(response) {
+    axios.get(ALL_NFTIMESHARES_URL, OPENSEA_HEADER).then(function(response) {
       if (response.status !== 200) {
         res.json(response);
         return;
@@ -332,6 +332,21 @@ app.get('/api/alltimesharemonths/:offset?', async function (req, res) {
     });
   }).catch((error) => {
   });
+});
+
+app.get('/api/monthTokensForTimeshare/:timeshareTokenId', async function (req, res) {
+  var monthIds = await nftimesharemonth.getTimeshareMonths(req.params.timeshareTokenId);
+  console.log(monthIds);
+  var monthLinks = monthIds.map((monthTokenId, i) => {
+    return {
+      asset_url: `https://opensea.io/assets/${nftimesharemonth.address}/${monthTokenId}`,
+      month    :  monthName(i)
+    }
+  });
+  res.json({
+    nfts: [...monthLinks],
+  })
+
 });
 
 app.use(express.static(path.join(__dirname, "..", "dapp/build")));

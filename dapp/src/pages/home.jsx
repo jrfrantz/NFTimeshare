@@ -7,7 +7,7 @@ import { NFTCardDeck } from '../components2/nftcarddeck';
 import { TimeshareJumbotron } from "../components2/timesharejumbotron";
 import { HowItWorks } from "../components2/howitworks";
 import { Credits } from "../components2/credits";
-import { ChooseMonth } from '../components2/choosemonth'
+import { ChooseMonthModal } from '../components2/choosemonthmodal'
 import axios from 'axios'
 
 
@@ -28,6 +28,8 @@ const Home = () => {
   const [publicTimesharesOffset, setPublicTimesharesOffset] = useState(0);
   const [isLoading, setIsLoading] = useState(false)
 
+  const [selectedTimeshare, setSelectedTimeshare] = useState(null);
+  const [childTimeshareMonths, setChildTimeshareMonths] = useState(null);
 
   const loadMoreTimeshareMonths = () => {
     //const ALL_TIMESHARES_API = `/api/alltimesharemonths/${publicTimesharesOffset}`;
@@ -75,15 +77,41 @@ const Home = () => {
     setTestNFT(tNFT);
   }
 
+  const handleTimeshareSelection = (parentNft) => {
+    setSelectedTimeshare(parentNft);
+  }
+  const clearTimeshareSelection = () => {
+    console.log('cleared timeshare selection');
+    setSelectedTimeshare(null);
+    setChildTimeshareMonths(null);
+  }
 
+  // load data required to show the month selection modal
+  useEffect(() => {
+    if (!selectedTimeshare) {
+      return;
+    }
+    console.log('selected ', selectedTimeshare);
+    const API_CHILD_IDS_FOR_TIMESHARE = `/api/monthTokensForTimeshare/${selectedTimeshare.token_id}`
+    axios.get(API_CHILD_IDS_FOR_TIMESHARE).then(function (response) {
+      if (response !== 200 || !response.data ) {
+        console.log("Bad response from server", response);
+      }
+      console.log("Child nfts are ", response.data.nfts);
+      setChildTimeshareMonths(response.data.nfts);
+    });
+  }, selectedTimeshare)
 
   return (
     <div>
-      <ChooseMonth />
+      <ChooseMonthModal selection={selectedTimeshare}
+        clearFunc={clearTimeshareSelection}
+        monthLinks={childTimeshareMonths} />
       <TimeshareJumbotron />
       <HowItWorks />
     <hr />
   <NFTCardDeck nfts={publicTimeshares} isLoading={isLoading}
+    selectionFunc={handleTimeshareSelection}
     loadMoreFunc={loadMoreTimeshareMonths} hasMore={publicTimesharesOffset > 0}/>
     <Credits />
     </div>

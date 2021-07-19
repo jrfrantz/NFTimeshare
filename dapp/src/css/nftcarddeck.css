@@ -4,6 +4,7 @@
 
 .nft-card-img {
   object-fit: scale-down;
+  flex-grow: 1;
 }
 
 .deposit-nft-header {
