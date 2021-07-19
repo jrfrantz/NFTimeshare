@@ -9,9 +9,6 @@ export const Credits = (props) => {
       <Breadcrumb.Item href='https://twitter.com/therealjfrantz'>
         Twitter
       </Breadcrumb.Item>
-      <Breadcrumb.Item href='https://www.linkedin.com/in/jacob-frantz/'>
-        LinkedIn
-      </Breadcrumb.Item>
     </Breadcrumb>
   )
 }

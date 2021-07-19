@@ -50,7 +50,12 @@ export const DepositRedeemExplainer = (props) => {
                 <Col className='d-flex justify-content-center'>
                   {!props.address ?
                   <Button size="lg" onClick={props.connectFunc}> Connect wallet </Button>
-                : <Button size='lg' variant="outline-success" disabled>{props.address}</Button>}
+                : <Button size='lg' variant="outline-success" disabled>
+                  {`${props.address.slice(0,6)}...${props.address.slice(
+                    props.address.length-4,
+                    props.address.length
+                  )}`}
+                </Button>}
               </Col>
             </Row>
           </Container>

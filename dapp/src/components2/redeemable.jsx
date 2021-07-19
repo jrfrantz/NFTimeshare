@@ -7,11 +7,11 @@ export const Redeemable = (props) => {
   }
   if (!props.nfts.length && props.hasMore < 0) {
     return (
-      <Container><Row><Col>
-        <p>
+      <Container><Row className='my-2'><Col>
+        <h6 >
           No Timeshares were found for your address. Deposit an NFT
           to make some!
-        </p>
+        </h6>
       </Col></Row></Container>
 
     )

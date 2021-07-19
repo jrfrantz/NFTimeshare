@@ -8,7 +8,9 @@ export const Depositable = (props) => {
 
   if (!props.nfts.length && props.hasMore < 0) {
     return (
-      <p>Opensea API didn't return any NFTs for your address.</p>
+      <Container><Row className='my-2'><Col >
+        <h6 >Opensea API didn't return any NFTs for your address.</h6>
+    </Col></Row></Container>
     )
   }
 
@@ -51,11 +53,16 @@ export const Depositable = (props) => {
         })}
       </Row>
       {props.isLoading &&
-         <Spinner animation='border' variant='dark' /> }
+        <Row><Col>
+         <Spinner animation='border' variant='dark' />
+        </Col></Row>}
       {props.hasMore > 0 && !props.isLoading &&
-        <Button onClick={props.loadMoreFunc} variant='outline-secondary'>
-          Load more
-        </Button>
+        <Row className='mx-2'><Col>
+          <Button className='btn-block' onClick={props.loadMoreFunc} variant='outline-secondary'>
+            Load more
+          </Button>
+        </Col></Row>
+
       }
     </Container>
   )

@@ -141,8 +141,10 @@ app.get('/api/ownednfts/:owner/:offset?', async function (req, res) {
       const nextOffset = assets.length > 20 ? offset + 20 : -1;
       console.log("opensea says", assets.length);
       assets = assets.filter((nft) =>
-        nft.asset_contract.address.toLowerCase() !==
-        contractAddress.NFTimeshareMonth.toLowerCase()
+        (nft.asset_contract.address.toLowerCase() !==
+        contractAddress.NFTimeshareMonth.toLowerCase())
+        && (nft.asset_contract.address.toLowerCase() !==
+          contractAddress.NFTimeshare.toLowerCase())
       );
       console.log('after filter', assets.length);
       assets = assets.map(function (nft)  {
@@ -226,6 +228,42 @@ app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
 
   app.get('/api/alltimeshares/:offset?', async function (req, res) {
     const offset = req.params.offset ? parseInt(req.params.offset) : 0;
+    const ALL_NFTIMESHARES_URL = `https://rinkeby-api.opensea.io/api/v1/assets?asset_contract_address=${contractAddress.NFTimeshare.toLowerCase()}&order_by=token_id&order_direction=desc&offset=${offset}&limit=21`;
+    console.log(ALL_NFTIMESHARES_URL);
+    const MOCK_FOUNDATION_URL = `https://api.opensea.io/api/v1/assets?asset_contract_address=0x3B3ee1931Dc30C1957379FAc9aba94D1C48a5405&order_direction=desc&offset=${offset}&limit=21`;
+    axios.get(MOCK_FOUNDATION_URL, OPENSEA_HEADER).then(function(response) {
+      if (response.status !== 200) {
+        res.json(response);
+        return;
+      }
+
+      var assets = response.data.assets;
+      const nextOffset = assets.length > 20 ? offset+20 : -1;
+      assets = assets
+        .filter((nft) => {return nft.owner.address !== "0x0000000000000000000000000000000000000000"})
+        .map((nft) => {
+          if (!nft.image_url) {
+            console.log(nft);
+          }
+          nft.name = nft.name  || `Token ${nft.token_id} from contract at ${nft.asset_contract.address}`;
+          //nft.media = nft.media || nft.image || nft.image_url || nft.image_data || nft.animation_url || nft.youtube_url;
+          nft.media = nft.image_url;
+          var monthTrait = nft.traits.find((trait) => {
+            return trait.trait_type === "Month"
+          });
+          nft.permalink = nft.permalink ? (nft.permalink+`?ref=${PROD_NFTIMESHARES_WALLET_ADDR}`) : ""
+          nft.month = monthTrait ? monthTrait.value : "";
+          return nft;
+      });
+      console.log("about to send json with ", assets, nextOffset);
+      res.json({
+        nfts: assets.slice(0,20),
+        nextOffset: nextOffset
+      });
+    }).catch((error) => {
+    });
+/*
+    const offset = req.params.offset ? parseInt(req.params.offset) : 0;
     var totalSupply = await nftimeshare.totalSupply();
     console.log('total supply is ', totalSupply.toString());
     var allTimeshareReqs = [...new Array(totalSupply).keys()].map((_, i) => {
@@ -254,6 +292,7 @@ app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
         nextOffset: -1
       })
     });
+    */
   });
 
 // for homescreen

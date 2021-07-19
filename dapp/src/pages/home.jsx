@@ -30,7 +30,8 @@ const Home = () => {
 
 
   const loadMoreTimeshareMonths = () => {
-    const ALL_TIMESHARES_API = `/api/alltimesharemonths/${publicTimesharesOffset}`;
+    //const ALL_TIMESHARES_API = `/api/alltimesharemonths/${publicTimesharesOffset}`;
+    const ALL_TIMESHARES_API = `/api/alltimeshares/${publicTimesharesOffset}`;
     setIsLoading(true);
     axios.get(ALL_TIMESHARES_API).then(function (response) {
       if (response.status != 200 || !response.data) {
