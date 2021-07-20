@@ -1,4 +1,5 @@
 import { Modal, Image, Badge, Container, Row, Col, Button, Spinner } from 'react-bootstrap'
+import { CalendarMonth, Calendar3 } from 'react-bootstrap-icons'
 export const ChooseMonthModal = ({selection, clearFunc, monthLinks, ...props}) => {
 
   /*var monthnfts = [
@@ -8,14 +9,14 @@ export const ChooseMonthModal = ({selection, clearFunc, monthLinks, ...props}) =
     return null;
   }
   return (
-    <Modal show={!!selection} onHide={clearFunc}>
+    <Modal show={!!selection} onHide={clearFunc} >
       <Modal.Header closeButton>
         <Modal.Title>
           Choose a Month
         </Modal.Title>
       </Modal.Header>
       <Image src={selection.media} width='100%'/>
-      <Modal.Body>
+    <Modal.Footer>
         <Container>
           <Row >
             { !!monthLinks && monthLinks.map((nft, i) => {
@@ -29,7 +30,7 @@ export const ChooseMonthModal = ({selection, clearFunc, monthLinks, ...props}) =
                     }
                     href={nft.asset_url}
                     target="_blank" rel="noopener noreferrer">
-                    {nft.month}
+                     { nft.month}
                   </Button>
                 </Col>
               )
@@ -43,7 +44,7 @@ export const ChooseMonthModal = ({selection, clearFunc, monthLinks, ...props}) =
             }
           </Row>
         </Container>
-      </Modal.Body>
+      </Modal.Footer>
     </Modal>
   )
 }

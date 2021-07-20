@@ -255,7 +255,6 @@ app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
           nft.month = monthTrait ? monthTrait.value : "";
           return nft;
       });
-      console.log("about to send json with ", assets, nextOffset);
       res.json({
         nfts: assets.slice(0,20),
         nextOffset: nextOffset

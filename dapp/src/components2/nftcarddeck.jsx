@@ -50,25 +50,27 @@ export const NFTCardDeck = (props) => {
             console.log(nft);
           }
           return (
+
             <Col md='6' lg='4' className='d-flex justify-content-center'>
-              <Card className='nft-card my-3' key={"nft_card_"+i}>
-                <Card.Header className='text-muted'>
-                  < Calendar3 /> {nft.month ? nft.month : "August"}
-                </Card.Header>
-                <Card.Img variant="top" className='nft-card-img mt-auto'
-                  src={nft.media ? nft.media : media_not_found}
-                  />
-                <Card.Title className='text-center mt-auto'>
-                  {nft.name}
-                </Card.Title>
-                <Card.Footer className='text-center'>
-                  <Button variant="outline-secondary"
-                    onClick={() => props.selectionFunc(nft)}>
-                    Choose Time
-                  </Button>
-                </Card.Footer>
-              </Card>
+              <a onClick={() => props.selectionFunc(nft)}>
+                <Card className='nft-card my-3 shadow' key={"nft_card_"+i}>
+
+                  <Card.Img variant="top" className='nft-card-img mt-auto'
+                    src={nft.media ? nft.media : media_not_found}
+                    />
+                  <Card.Title className='text-center mt-auto'>
+                    {nft.name}
+                  </Card.Title>
+                  <Card.Footer className='text-center'>
+                    <Button variant="outline-secondary"
+                      onClick={() => props.selectionFunc(nft)}>
+                      Choose Time
+                    </Button>
+                  </Card.Footer>
+                </Card>
+              </a>
             </Col>
+
         )})}
       </Row>
 

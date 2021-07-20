@@ -1,5 +1,6 @@
 .nft-card {
   width: 300px;
+  flex-grow: 1;
 }
 
 .nft-card-img {
