@@ -33,21 +33,23 @@ export const Depositable = (props) => {
         {props.nfts.map((nft, i) => {
           return (
             <Col md='6' lg='4' className='d-flex justify-content-center'>
-              <Card className='nft-card my-3' key={`deposit_card_${i}`}>
-                <Card.Header className='deposit-nft-header'>
-                  <Card.Title className='text-center'>
-                    {nft.name}
-                  </Card.Title>
-                </Card.Header>
-                <Card.Img className='nft-card-img' variant="top"
-                  src={nft.media ? nft.media : media_not_found}/>
-                <Card.Footer className='text-center mt-auto px-3 py-2'>
-                  <Button className='btn-block px-0'
-                    onClick={() => props.onClickDeposit(nft)}>
-                    Deposit
-                  </Button>
-              </Card.Footer>
-              </Card>
+              <a onClick={() => props.onClickDeposit(nft)}>
+                <Card className='nft-card my-3 shadow' key={`deposit_card_${i}`}>
+                  <Card.Header className='deposit-nft-header'>
+                    <Card.Title className='text-center'>
+                      {nft.name}
+                    </Card.Title>
+                  </Card.Header>
+                  <Card.Img className='nft-card-img' variant="top"
+                    src={nft.media ? nft.media : media_not_found}/>
+                  <Card.Footer className='text-center mt-auto px-3 py-2'>
+                    <Button className='btn-block px-0'
+                      onClick={() => props.onClickDeposit(nft)}>
+                      Deposit
+                    </Button>
+                </Card.Footer>
+                </Card>
+              </a>
             </Col>
           )
         })}

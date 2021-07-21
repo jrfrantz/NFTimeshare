@@ -1,9 +1,3 @@
-/* import TokenArtifact from "./src/contracts/Token.json";
-import NFTimeshareArtifact from "./src/contracts/NFTimeshare.json";
-import NFTimeshareMonthArtifact from "./src/contracts/NFTimeshareMonth.json";
-import TestNFTArtifact from "./src/contracts/TestNFT.json";
-import contractAddress from "./src/contracts/contract-address.json";*/
-
 const express = require('express')
 const path = require('path')
 const { ethers } = require("ethers");
@@ -23,25 +17,29 @@ const app = express()
   .set('view engine', 'ejs')
 
 const OPENSEA_HEADER = {headers: {'X-API-KEY': OPENSEA_API_KEY}};
-// Static public files
-//app.use(express.static(path.join(__dirname, 'public')))
 
 setupContracts();
-//app.use('/', express.static('../frontend/build'));
-/*app.get('/', async function(req, res) {
-  //res.send('Get ready for OpenSea!');
-  //var l = await provider.getBlockNumber();
-  //var y = await nftimesharemonth.totalSupply();
-  //res.send(y.toString());
-})*/
-/* app.get("/", async function(req, res) {
-  console.log("asked to get root");
-  res.sendFile(path.join(__dirname, "..", "frontend/build"));
-})*/
-//app.use(express.static(path.join(__dirname, "..", "frontend/build")));
-//app.use(express.static("../frontend/public"));
 
-
+app.get('/timeshareprojectmetadata', function(req,res) {
+  res.json({
+    "name": "NFTimeshares",
+    "description": "Turn any Ethereum ERC721 NFT into a Timeshare. Deposit an NFT to receive 12 timeshares of that NFT -- one for each month. Redeem the original NFT by giving back 12 timeshares of that NFT. Tokens from this contract represent the underlying (deposited) NFT.",
+    "image": "https://www.nftimeshares.fun/favicon.ico",
+    "external_link": "https://www.nftimeshares.fun",
+    "seller_fee_basis_points": 0,
+    "fee_recipient": "0x0000000000000000000000000000000000000000"
+  })
+})
+app.get('/timesharemonthprojectmetadata', function(req,res) {
+  res.json({
+    "name": "NFTimeshares",
+    "description": "Turn any Ethereum ERC721 NFT into a Timeshare. Deposit an NFT to receive 12 timeshares of that NFT -- one for each month. Redeem the original NFT by giving back 12 timeshares of that NFT. Tokens from this contract represent ownership of one month of a timeshared NFT.",
+    "image": "https://www.nftimeshares.fun/favicon.ico",
+    "external_link": "https://www.nftimeshares.fun",
+    "seller_fee_basis_points": 0,
+    "fee_recipient": "0x0000000000000000000000000000000000000000"
+  })
+})
 // need one for timeshare and one for timesharemonth
 app.get('/timesharemonth/:token_id', async function(req, res) {
   // 1/ get parent nft's tokenId for this timeshare
@@ -177,8 +175,9 @@ app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
   if (!ownerAddr) {
     res.json("Error: no owner specified in request to /ownedtimesharemonths api");
   }
-  var tokens = await nftimesharemonth.tokensOf(ownerAddr);
-  tokens = tokens.map(({tokenId, month, tokenURI}) => {
+  var tokens = await nftimesharemonth.tokensOf(ownerAddr, offset, 21);
+  var nextOffset = tokens.length > 20 ? offset + 20 : -1;
+  tokens = tokens.slice(0,20).map(({tokenId, month, tokenURI}) => {
     return {
       token_id: tokenId.toString(),
       month: monthName(month),
@@ -199,7 +198,7 @@ app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
       });
       res.json({
         nfts: tokens,
-        nextOffset: -1
+        nextOffset: nextOffset
       });
     });
 
@@ -261,37 +260,6 @@ app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
       });
     }).catch((error) => {
     });
-/*
-    const offset = req.params.offset ? parseInt(req.params.offset) : 0;
-    var totalSupply = await nftimeshare.totalSupply();
-    console.log('total supply is ', totalSupply.toString());
-    var allTimeshareReqs = [...new Array(totalSupply).keys()].map((_, i) => {
-      console.log('in loop number ', i);
-      var thisTokenId;
-      var thisTokenURI;
-      return nftimeshare.tokenByIndex(i)
-      .then(function (tokenId) {
-        console.log("tokenid is", tokenId.toString());
-        thisTokenId = tokenId.toString();
-        return nftimeshare.tokenURI(thisTokenId)
-      }).then(function (tokenURI) {
-        console.log('tokenuri is ', tokenURI);
-        thisTokenURI = tokenURI.toString();
-        return {
-          tokenId: thisTokenId,
-          tokenURI: thisTokenURI
-        }
-      });
-    });
-    console.log(allTimeshareReqs);
-    console.log(allTimeshareReqs.lenth)
-    Promise.all(allTimeshareReqs).then(function (tokens) {
-      res.json({
-        nfts: tokens,
-        nextOffset: -1
-      })
-    });
-    */
   });
 
 // for homescreen

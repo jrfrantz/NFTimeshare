@@ -45,6 +45,11 @@ contract NFTimeshareMonth is Initializable, ERC721EnumerableUpgradeable, Ownable
         assert(false); // couldn't find month for tokenId
     }
 
+    // for opensea https://docs.opensea.io/docs/contract-level-metadata
+    function contractURI() public view returns (string memory) {
+      return "http://www.nftimeshares.fun/timesharemonthprojectmetadata";
+    }
+
     function _baseURI() internal view virtual override returns (string memory) {
       return "http://www.nftimeshares.fun/timesharemonth/";
     }

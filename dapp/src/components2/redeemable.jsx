@@ -38,35 +38,42 @@ export const Redeemable = (props) => {
         {props.nfts.map((nft, i) => {
           return (
             <Col md='6' lg='4' className='d-flex justify-content-center'>
-              <Card className='nft-card my-3' key={`deposit_card_${i}`}>
-                <Card.Header className='text-muted'>
-                  < Calendar3 /> {nft.month}
-                </Card.Header>
-                <Card.Img variant="top" className='nft-card-img' src={nft.media} />
-                <Card.Title className='text-center mt-auto'>
-                  {nft.name}
-                </Card.Title>
-                <Card.Footer className='text-center'>
-                  <Button variant='outline-secondary'
-                    onClick={()=> props.onClickRedeem(nft)}>
-                    Redeem
-                  </Button>
-                </Card.Footer>
-              </Card>
+              <a onClick={() => props.onClickRedeem(nft)}>
+                <Card className='nft-card my-3 shadow' key={`deposit_card_${i}`}>
+                  <Card.Header className='text-muted'>
+                    < Calendar3 /> {nft.month}
+                  </Card.Header>
+                  <Card.Img variant="top" className='nft-card-img' src={nft.media} />
+                  <Card.Title className='text-center mt-auto'>
+                    {nft.name}
+                  </Card.Title>
+                  <Card.Footer className='text-center'>
+                    <Button variant='outline-secondary'
+                      onClick={()=> props.onClickRedeem(nft)}>
+                      Redeem
+                    </Button>
+                  </Card.Footer>
+                </Card>
+              </a>
             </Col>
           )
         })}
       </Row>
       {props.isLoading &&
-        <div>
-          <Spinner animation='outline'/>
-        <p>Loading your timeshares from the blockchain. This usually takes a minute...</p>
-        </div>
+        <Row><Col>
+        <span>
+          Loading your timeshares from the blockchain. This usually takes a minute
+          {' '}<Spinner size='sm' animation='grow'/>
+          </span>
+        </Col></Row>
       }
       {props.hasMore > 0 && !props.isLoading &&
-        <Button onClick={props.loadMoreFunc} variant='outline-secondary'>
-          Load more
-        </Button>
+        <Row className='mx-2'><Col>
+          <Button className='btn-block'
+            onClick={props.loadMoreFunc} variant='outline-secondary'>
+            Load more
+          </Button>
+        </Col></Row>
       }
     </Container>
   )

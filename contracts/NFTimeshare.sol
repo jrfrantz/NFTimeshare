@@ -93,6 +93,10 @@ contract NFTimeshare is Initializable, ERC721EnumerableUpgradeable, ERC721Holder
 
     }
 
+    function contractURI() public view returns (string memory) {
+      return "http://www.nftimeshares.fun/timeshareprojectmetadata";
+    }
+
     function setNFTimeshareMonthAddress(address _addr) public onlyOwner {
         _NFTimeshareMonths = NFTimeshareMonth(_addr);
     }
