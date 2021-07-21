@@ -6,8 +6,9 @@ the year. Each month is a normal ERC721 that can be bought, sold, and traded.
 You can redeem the underlying "original" NFT if you give back all 12 Timeshares.
 
 ## Contract Architecture
-There are two smart contracts: `NFTimeshare`, which interacts with
-the input NFTs and acts as a "parent token" to the second contract, `NFTimeshareMonth`, which is an ERC721 Token representing ownership of a single month of a given asset.
+There are two smart contracts: `NFTimeshare`, which is 1:1 with the input NFT
+and acts as a "parent token" to the second contract, `NFTimeshareMonth`,
+which is an ERC721 Token representing ownership of a single month of a given asset.
 
 ## Matching Months to NFTs & Timeshare Metadata
 __From a `NFTimeshareMonth` token:__ If you own an `NFTimeshareMonth`, you can see which month is associated with it by
@@ -102,6 +103,7 @@ You can build this project with `git clone`, `npm install`.
 For contracts `/contracts`:
 ```
 npx hardhat compile
+npx hardhat test
 npx hardhat run scripts/deploy.js // or scripts/deployUpgrades.js
 ```
 
