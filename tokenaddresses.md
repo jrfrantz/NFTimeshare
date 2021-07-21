@@ -34,3 +34,12 @@ Token address: 0x6062cc344A7c4C036789892C447Ff32F0c051923
 NFTimeshare addr: 0xe4aA8DE6adea71Aab6db1dEB2a34afDCc19ce295
 NFTimeshareMonth addr: 0x1909E978C0d4BC90D93bbD1CC367297d2bea1b2F
 TestNFT addr:  0xadC35554AF561DAf224fC23Bf9C6Eb37CaD2aCc4
+
+# after borking the github repo
+Deploying the contracts with the account: 0xb0997919649A3c8a21B6adc701a76b6235DeAa43
+Account balance: 1939131251807044720
+Token address: 0x6062cc344A7c4C036789892C447Ff32F0c051923
+NFTimeshare addr: 0xe4aA8DE6adea71Aab6db1dEB2a34afDCc19ce295
+NFTimeshareMonth addr: 0x1909E978C0d4BC90D93bbD1CC367297d2bea1b2F
+TestNFT addr:  0xadC35554AF561DAf224fC23Bf9C6Eb37CaD2aCc4
+parent directory is  /Users/jacobfrantz/Documents/Projects/crypto/NFTimeshare/scripts

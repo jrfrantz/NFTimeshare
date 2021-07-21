@@ -367,8 +367,27 @@ describe("NFTimeshare and NFTimeshareMonths contract", function () {
       }
     });
     it("Should enumerate all tokens effectively", async function() {
-      var tokensOf = await tTimeshareMonth.tokensOf(addr1.address);
+      var tokensOf = await tTimeshareMonth.tokensOf(addr1.address, 0, 12);
       expect(tokensOf.length).to.equal(12);
+    });
+    it("Should handle enumerations that are too long", async function() {
+      var tokensOf = await tTimeshareMonth.tokensOf(addr1.address, 0, 20);
+      expect(tokensOf.length).to.equal(12);
+    });
+    it("Should stop early when appropriate", async function () {
+      var tokensOf = await tTimeshareMonth.tokensOf(addr1.address, 0, 10);
+      expect(tokensOf.length).to.equal(10);
+    });
+    it("Should deal with offset and early termination early", async function() {
+      var tokensOf = await tTimeshareMonth.tokensOf(addr1.address, 1, 2);
+      var tokensOfLong = await tTimeshareMonth.tokensOf(addr1.address, 0, 3);
+      expect(tokensOf.length).to.equal(2);
+      expect(tokensOf).to.eql(tokensOfLong.slice(1));
+    })
+    it("Should work with startIndex AND too long limit", async function() {
+      var tokensOf      = await tTimeshareMonth.tokensOf(addr1.address, 11, 100);
+      var tokensOfTight = await tTimeshareMonth.tokensOf(addr1.address, 11, 1);
+      expect(tokensOf).to.eql(tokensOfTight);
     })
   });
 

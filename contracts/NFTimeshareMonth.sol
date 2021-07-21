@@ -119,16 +119,24 @@ contract NFTimeshareMonth is Initializable, ERC721EnumerableUpgradeable, Ownable
     }
 
     // convenience method to get all the necessary info about a user in one call
-    // TODO pagination
-    function tokensOf(address owner) public view virtual returns (TimeshareMonthInfo[] memory) {
+    // returns tokens at indices start to start+limit-1
+    function tokensOf(address owner, uint256 start, uint256 limit) public view virtual returns (TimeshareMonthInfo[] memory) {
       uint256 ownerBalance = ERC721Upgradeable.balanceOf(owner);
-      TimeshareMonthInfo[] memory retval = new TimeshareMonthInfo[](ownerBalance);
-      for (uint256 i = 0; i < ownerBalance; i++) {
+      uint256 numToReturn  = limit;
+      uint256 maxIdx       = start + limit;
+
+      if (start + limit > ownerBalance) {
+        maxIdx      = ownerBalance;
+        numToReturn = ownerBalance - start;
+      }
+
+      TimeshareMonthInfo[] memory retval = new TimeshareMonthInfo[](numToReturn);
+      for (uint256 i = start; i < maxIdx; i++) {
         TimeshareMonthInfo memory idx;
         idx.tokenId = tokenOfOwnerByIndex(owner, i);
         idx.month = month(idx.tokenId);
         idx.tokenURI = tokenURI(idx.tokenId);
-        retval[i] = idx;
+        retval[i - start] = idx;
       }
       return retval;
     }
