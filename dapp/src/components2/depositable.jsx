@@ -31,6 +31,7 @@ export const Depositable = (props) => {
       { getHeading() }
       <Row className='mx-2'>
         {props.nfts.map((nft, i) => {
+          
           return (
             <Col md='6' lg='4' className='d-flex justify-content-center'>
               <a onClick={() => props.onClickDeposit(nft)}>

@@ -14,12 +14,13 @@ export const TransactionAlerts = (props) => {
       etherscan_url: `https://etherscan.io/tx/${txn.txHash}`,
     }
     switch (txn.method) {
-      case "REDEEM":
+      case "DEPOSIT":
         alertProps.method = "Deposit ";
         break;
-      case "DEPOSIT":
+      case "REDEEM":
         alertProps.method = "Redeem ";
         break;
+
     }
     switch (txn.status) {
       case "PENDING":

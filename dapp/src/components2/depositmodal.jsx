@@ -6,6 +6,11 @@ export const DepositModal = (props) => {
   }
 
   const nft = props.nftInfo.nft;
+  const isERC721 = props.nftInfo.nft.asset_contract.schema_name === "ERC721"
+  const isCustodied = props.nftInfo.nft.owner.address === props.viewerAddress /*selectedaddr*/
+  console.log("is erc721? ", isERC721);
+  console.log("is direct custody? ", isCustodied);
+
 
   var externalContract = nft.asset_contract.address.toLowerCase();
   var externalTokenId = nft.token_id.toLowerCase()
@@ -45,6 +50,60 @@ export const DepositModal = (props) => {
         }
     }
   }
+
+  if (!isERC721) {
+    /*Don't yet support ERC1155*/
+    return (
+      <Modal show={nft != null} onHide={props.handleCloseFunc}>
+        <Modal.Header>
+          <Modal.Title>
+            Error: Can only deposit ERC721 NFTs
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className='text-danger'>
+          <Image src={nft.media} width='100%'/>
+          According to{' '}
+          <a href={nft.permalink} target="_blank" rel="noopener noreferrer">
+          Opensea.io
+          </a>
+          , this token is an {nft.asset_contract.schema_name}, not an ERC721.
+          Only ERC721 tokens can be deposited and turned into Timeshares.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button className='btn-block' variant='outline-danger' disabled>
+            Deposit
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    )
+  } else if (!isCustodied) {
+    return (
+      <Modal show={nft != null} onHide={props.handleCloseFunc}>
+        <Modal.Header>
+          <Modal.Title>
+            Error: Asset not owned by this wallet.
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body className='text-danger'>
+          <Image src={nft.media} width='100%'/>
+          According to{' '}
+          <a href={nft.permalink} target="_blank" rel="noopener noreferrer">
+          Opensea.io
+          </a>
+          , this token isn't owned by the wallet that's been connected to this site.
+          This can happen if Opensea is custodying the NFT for your account, instead
+          of being owned directly by you. If so, this can be solved by transferring
+          it to your wallet address on Opensea.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button className='btn-block' variant='outline-danger' disabled>
+            Deposit
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    )
+  }
+
   return (
     <Modal show={nft != null} onHide={props.handleCloseFunc} background={pendingStatus.status === "PENDING" ? "static" : ""}>
       <Modal.Header closeButton>

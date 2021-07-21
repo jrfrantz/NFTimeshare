@@ -16,10 +16,11 @@ import ERC721abi from "../contracts/ERC721abi.json"
 import { Modal, Toast, Alert } from 'react-bootstrap'
 import { Credits } from '../components2/credits'
 import {TransactionAlerts } from '../components2/transactionalerts'
+import { NoWalletDetected } from '../components2/nowalletdetected'
 
 const GetStarted = () => {
   const [address, setAddress] = useState("");
-
+  const [needsWallet, setNeedsWallet] = useState(false);
 
   const [nftimeshare, setNftimeshare] = useState({});
   const [nftimesharemonth, setNftimesharemonth] = useState({});
@@ -45,7 +46,6 @@ const GetStarted = () => {
   // get address
   useEffect(() => {
     if (!window.ethereum) {
-      console.log("no ethereum window");
       return;
     }
     window.ethereum.on("accountsChanged", ([newAddress]) => {
@@ -99,6 +99,10 @@ const GetStarted = () => {
 
 
   const connectWallet = async () => {
+    if (!window.ethereum) {
+      setNeedsWallet(true);
+      return;
+    }
     const [selectedAddress] = await window.ethereum.enable();
     console.log(selectedAddress);
 
@@ -132,7 +136,9 @@ const GetStarted = () => {
     console.log("selected an nft: ", nft)
     setSelectedNFT({nft: nft, method: "REDEEM"});
   }
-
+  const handleAcknowledgeNeedsWallet = () => {
+    setNeedsWallet(false);
+  }
   const handleCloseModal = () => {
     setSelectedNFT(null);
     // clear back out all the pending deposits probably
@@ -164,9 +170,9 @@ const GetStarted = () => {
         ERC721abi.interface,
         new ethers.providers.Web3Provider(window.ethereum).getSigner(0)
       );
-      await erc721Contract.setApprovalForAll(contractAddress.NFTimeshare, true);
-
-      // handle errors for setApprove rejections here.
+      // TODO check if already approved to avoid needing to do so again
+      var approvalTx = await erc721Contract.setApprovalForAll(contractAddress.NFTimeshare, true);
+      
       var tx = await nftimeshare.deposit(
         externalContract,
         externalTokenId,
@@ -186,12 +192,16 @@ const GetStarted = () => {
             }
           ]
         });
+        ethersProvider.waitForTransaction(tx.hash, 5);
+        status = "SUCCESS";
       }
-      ethersProvider.waitForTransaction(tx.hash, 5);
-      status = "SUCCESS";
     } catch (error) {
+      console.log("rejected deposit ", error);
       status = "ERROR";
     } finally {
+      if (!tx) {
+        return;
+      }
       setPendingDeposits((deposits) => {
         var idx = deposits.findIndex(
           (deposit) => deposit.contract === externalContract.toLowerCase && deposit.tokenId === externalTokenId.toLowerCase()
@@ -206,28 +216,28 @@ const GetStarted = () => {
           }
         ];
       });
-      if (tx) {
-        setSentTxns((txns) => {
-          var idx = txns.findIndex(
-            (txn) => txn.txHash === tx.hash
-          );
-          console.log('found txn at ', idx, txns[idx]);
-          return [
-              ...txns.splice(idx, 1),
-              {
-                txHash: tx.hash,
-                contract: externalContract,
-                tokenId: externalTokenId,
-                method: "DEPOSIT",
-                status: status
-              }
-            ];
-          });
-        }
+
+      setSentTxns((txns) => {
+        var idx = txns.findIndex(
+          (txn) => txn.txHash === tx.hash
+        );
+        console.log('found txn at ', idx, txns[idx]);
+        return [
+            ...txns.splice(idx, 1),
+            {
+              txHash: tx.hash,
+              contract: externalContract,
+              tokenId: externalTokenId,
+              method: "DEPOSIT",
+              status: status
+            }
+          ];
+        });
       }
+
     }
 
-    function dismissTxnAlert(txn) {
+  function dismissTxnAlert(txn) {
       setSentTxns((txns) => {
         var idx = txns.findIndex((tx) => tx.txHash === txn.txHash);
         if (idx > -1) {
@@ -276,9 +286,9 @@ const GetStarted = () => {
             }
           ]
         })
+        ethersProvider.waitForTransaction(tx.hash, 5);
+        status = "SUCCESS";
       }
-      ethersProvider.waitForTransaction(tx.hash, 5);
-      status = "SUCCESS";
     } catch (error) {
       console.log(error);
       status = "ERROR";
@@ -299,6 +309,9 @@ const GetStarted = () => {
         ];
       });
       setSentTxns((txns) => {
+        if (!tx) {
+          return txns;
+        }
         var idx = txns.findIndex(
           (txn) => txn.txHash === tx.hash
         );
@@ -318,6 +331,8 @@ const GetStarted = () => {
   console.log("entering render with ", pendingDeposits, pendingRedemptions);
   return (
     <div>
+      <NoWalletDetected needsWallet={needsWallet}
+        dismissFunc={handleAcknowledgeNeedsWallet}/>
       <DepositRedeemExplainer address={address} connectFunc={()=>connectWallet()} />
       <TransactionAlerts txnAlerts={sentTxns} dismissFunc={dismissTxnAlert}/>
       <Depositable isLoading={isLoadingOwnedNFTs}
@@ -330,7 +345,8 @@ const GetStarted = () => {
       <DepositModal nftInfo={selectedNFT}
         handleCloseFunc={handleCloseModal}
         confirmDepositFunc={confirmDepositNft}
-        pendingDeposits={pendingDeposits}/>
+        pendingDeposits={pendingDeposits}
+        viewerAddress={address}/>
       <RedeemModal nftInfo={selectedNFT}
         handleCloseFunc={handleCloseModal}
         confirmRedeemFunc={redeemNft}
