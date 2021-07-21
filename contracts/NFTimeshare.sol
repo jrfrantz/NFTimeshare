@@ -149,7 +149,6 @@ contract NFTimeshare is Initializable, ERC721EnumerableUpgradeable, ERC721Holder
     }
 
     function ownerOf(uint256 tokenId) public view virtual override returns (address) {
-        // -- override so that it only shows WHOEVER HOLDS THE CURRENT MONTH
         uint256 curMonth = block.timestamp.getMonth()-1;
         uint256[12] memory timeshareMonths = _NFTimeshareMonths.getTimeshareMonths(tokenId); // 0-indexed
         return _NFTimeshareMonths.ownerOf(timeshareMonths[curMonth]);

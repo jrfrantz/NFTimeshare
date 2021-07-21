@@ -17,19 +17,19 @@ export const HowItWorks = (props) => {
               <div className='d-flex justify-content-center mb-2'>
                 <Gift className="cta-icon"/>
               </div>
-            <h5>Any NFT can be converted into 12 timeshare NFTs — one for each month.</h5>
+            <h5>Deposit any NFT to get back 12 timeshare NFTs — each constitutes ownership one month of the year</h5>
           </Col>
           <Col>
             <div className='d-flex justify-content-center mb-2'>
               <ArrowLeftRight className="cta-icon"/>
             </div>
-            <h5>Timeshares can be bought, sold, and traded like any other NFTs.</h5>
+            <h5>Months of a Timeshare can be bought, sold, and traded just like any other NFT</h5>
           </Col>
           <Col >
             <div className='d-flex justify-content-center mb-2'>
               <Diagram3 className="cta-icon"/>
             </div>
-            <h5>You can always exchange back all 12 months to get your original NFT.</h5>
+            <h5>If you have all 12 timeshare NFTs, you can redeem the original NFT</h5>
           </Col>
         </Row>
         <Row className='align-self-flex-end mt-3 mb-2'>

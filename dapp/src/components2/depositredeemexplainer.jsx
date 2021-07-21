@@ -12,12 +12,18 @@ export const DepositRedeemExplainer = (props) => {
       target="_blank" rel="noopener noreferrer">
       here
     </a>
+
+  const ETHERSCAN_HREF =
+    <a href='https://rinkeby.etherscan.io/address/0xe4aa8de6adea71aab6db1deb2a34afdcc19ce295'
+      target="_blank" rel="noopener noreferrer">
+      here
+    </a>
     return (
         <Jumbotron className='pb-4' fluid>
           <Container className='mb-0'>
-            <Row>
+            <Row className='mb-3'>
               <Col>
-              <h1>Deposit or Redeem Timeshares {' '}
+              <h1 className='display-4'>Deposit or Redeem Timeshares {' '}
                 <small>
                   <Badge variant='warning' size='sm'>BETA</Badge>
                 {' '}<Badge variant='secondary' size='sm'>Rinkeby</Badge>
@@ -26,21 +32,22 @@ export const DepositRedeemExplainer = (props) => {
 
               </Col>
             </Row>
-            <Row className='px-1'>
+            <Row className='px-2'>
               <Col>
                 <p>
-                    Deposit any ERC721 token to receive 12 newly-minted NFTs in return
+                    <b>Deposit</b> any ERC721 token to receive 12 newly-minted NFTs in return
                     — one for each month of the year. Each NFT has a different month
-                    associated with it on the Ethereum blockchain. These don't "expire"
+                    associated with it on the Ethereum blockchain. These don't expire
                     after a year — you own the asset fully for the same month each year.
                 </p>
                 <p>
-                    You can always redeem the underlying asset by giving back all
+                    <b>Redeem</b> the underlying asset by giving back all
                     of the 12 timeshares. You must own or operate all 12 timeshares
                     to get back the original NFT.
                 </p>
-                <p>
+                <p className='text-muted'>
                     All code is open source and can be viewed {GITHUB_HREF}.
+                    The contract itself can be viewed on Etherscan {ETHERSCAN_HREF}.
                     It has not been professionally audited. If you're a project or
                     developer looking to integrate Timeshares, {CONTACT_HREF}!
                 </p>
