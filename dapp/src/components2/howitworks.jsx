@@ -35,7 +35,7 @@ export const HowItWorks = (props) => {
         <Row className='align-self-flex-end mt-3 mb-2'>
           <Col className='d-flex justify-content-center'>
             <Link to="/getstarted">
-              <Button>
+              <Button variant='light'>
                 Deposit an NFT
               </Button>
             </Link>
