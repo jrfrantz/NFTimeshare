@@ -11,6 +11,7 @@ and acts as a "parent token" to the second contract, `NFTimeshareMonth`,
 which is an ERC721 Token representing ownership of a single month of a given asset.
 
 ## Matching Months to NFTs & Timeshare Metadata
+### ...from the blockchain (1/2)
 __From a `NFTimeshareMonth` token:__ If you own an `NFTimeshareMonth`, you can see which month is associated with it by
 1. Calling `month(tokenId)`, which returns a number between 0 (Jan) and 11 (Dec)
 2. Accessing the metadata `tokenURI(tokenId)`, which returns the same metadata
@@ -23,7 +24,7 @@ for whatever month it is now, according to the blockchain.
 __From the underlying NFT__: If you only know the info about the underlying timeshared asset (for example, maybe you're a video game and looking for the current owner of
 an in-game power-up), you can use getter method `getTokenIdForUnderlyingNFT(your_nft_contract_address, your_nft_token_id)`. Then use the above :)
 
-Example metadata:
+### ...from metadata server (2/2)
 ```
 // For parent Timeshare asset wrapper
 GET 'http://www.nftimeshares.fun/timeshare/tokenId'
@@ -94,9 +95,9 @@ NFTimeshare.redeem(tokenId, RecipientAddress)
 
 
 ## `TODO`, Feedback, Bugs, Issues
-The smart contracts are not audited, and this project doesn't make any money.
+The smart contracts are not audited, and this project doesn't make money.
 Please disclose bugs and vulnerabilities. Pull requests will be reviewed an ad-hoc
-basis.
+basis. Donations for server costs and LaCroixs are accepted at `0x3871A56C08fB2B2820449De602C6d0b0075bcE5D`
 
 You can build this project with `git clone`, `npm install`.
 

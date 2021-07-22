@@ -8,7 +8,7 @@ require("./tasks/faucet");
 require("@nomiclabs/hardhat-ethers");
 require('@openzeppelin/hardhat-upgrades');
 
-const { alchemyApiKey, mnemonic, ETHERSCAN_API_KEY } = require('./secrets.json');
+const { RINKEBY_ALCHEMY_KEY_URL, RINKEBY_MNEMONIC, ETHERSCAN_API_KEY } = require('./secrets.json').rinkeby;
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -23,8 +23,9 @@ module.exports = {
   },
   networks: {
      rinkeby: {
-       url: `${alchemyApiKey}`,
-       accounts: {mnemonic: mnemonic}
+       url: `${RINKEBY_ALCHEMY_KEY_URL}`,
+       accounts:
+        { mnemonic: RINKEBY_MNEMONIC}
      }
   },
   etherscan: {

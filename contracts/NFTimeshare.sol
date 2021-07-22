@@ -1,5 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.7.0 <0.9.0;
+//     __  ___  _____ _                     _
+//  /\ \ \/ __\/__   (_)_ __ ___   ___  ___| |__   __ _ _ __ ___  ___
+//  /  \/ / _\    / /\/ | '_ ` _ \ / _ \/ __| '_ \ / _` | '__/ _ \/ __|
+// / /\  / /     / /  | | | | | | |  __/\__ \ | | | (_| | | |  __/\__ \
+// \_\ \/\/      \/   |_|_| |_| |_|\___||___/_| |_|\__,_|_|  \___||___/
+
 
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
@@ -49,7 +55,6 @@ contract NFTimeshare is Initializable, ERC721EnumerableUpgradeable, ERC721Holder
 
 
 
-    //constructor() ERC721("Timeshare", "TSBO") {}
     function initialize() public initializer {
       __Context_init_unchained();
       __ERC165_init_unchained();
@@ -59,13 +64,17 @@ contract NFTimeshare is Initializable, ERC721EnumerableUpgradeable, ERC721Holder
       __ERC721Holder_init_unchained();
     }
 
+    /* CORE LOGIC: DEPOSIT an NFT for TimeshareMonths, or REDEEM it back from TimeshareMonths*/
+
     // given an an NFT (contract + tokenId), wrap it and mint it into timeshares.
     // this contract must be approved to operate it. _to must be able to receive erc721s.
     function deposit(address _underlying, uint256 _underlyingTokenId, address _from, address _to) public needsTimeshareMonths {
         require(_underlying != address(_NFTimeshareMonths), "Deposit: Cant make timeshares out of timeshares");
         _tokenIds.increment();
         uint256 newTokenId = _tokenIds.current();
+
         _safeMint(address(this), newTokenId);
+
         _tokenIdForUnderlying[_underlying][_underlyingTokenId] = newTokenId;
         _wrappedNFTs[newTokenId] = UnderlyingNFT(_underlying, _underlyingTokenId);
 
@@ -77,7 +86,7 @@ contract NFTimeshare is Initializable, ERC721EnumerableUpgradeable, ERC721Holder
 
     // redeem a wrapped NFT if you own all the timeshares.
     // approves sender to withdraw NFT but owner still needs to initiate transfer
-    // TODO split redeem into redeem + withdraw to match a pull-payment style.
+    // TODO split redeem into redeem + withdraw ?
     function redeem(uint256 tokenId, address _to) public virtual needsTimeshareMonths {
         UnderlyingNFT memory underlyingNFT = _wrappedNFTs[tokenId];
         require(underlyingNFT._contractAddr != address(0) && underlyingNFT._tokenId != 0, "Redeem Timeshare: Nonexistent tokenId");
@@ -93,47 +102,8 @@ contract NFTimeshare is Initializable, ERC721EnumerableUpgradeable, ERC721Holder
 
     }
 
-    function contractURI() public view returns (string memory) {
-      return "http://www.nftimeshares.fun/timeshareprojectmetadata";
-    }
-
-    function setNFTimeshareMonthAddress(address _addr) public onlyOwner {
-        _NFTimeshareMonths = NFTimeshareMonth(_addr);
-    }
-
-    function getNFTimeshareMonthAddress() public view returns (address) {
-      return address(_NFTimeshareMonths);
-    }
-
-    function getWrappedNFT(uint256 tokenId) public view returns (address, uint256) {
-        // make sure tokenId exists...
-        UnderlyingNFT memory underlying = _wrappedNFTs[tokenId];
-        return (underlying._contractAddr, underlying._tokenId);
-    }
-    function getTokenIdForUnderlyingNFT(address addr, uint256 externalTokenId) public view returns (uint256) {
-      return _tokenIdForUnderlying[addr][externalTokenId];
-    }
-
-    function _baseURI() internal view virtual override returns (string memory) {
-      return "http://www.nftimeshares.fun/timeshare/";
-    }
-    function _exists(uint256 tokenId) internal view virtual override returns (bool) {
-      return (_wrappedNFTs[tokenId]._contractAddr != address(0));
-    }
-    function underlyingTokenURI(uint256 tokenId) public view virtual needsTimeshareMonths returns (string memory) {
-        UnderlyingNFT memory underlying = _wrappedNFTs[tokenId];
-        string memory retval = IERC721MetadataUpgradeable(underlying._contractAddr).tokenURI(underlying._tokenId);
-        return retval;
-    }
-
-    modifier needsTimeshareMonths {
-        require(address(_NFTimeshareMonths) != address(0x0), "NFTimeshare contract address hasn't been set up");
-        _;
-    }
-    modifier disallowed {
-        require(false, "Disallowed operation on NFTimeshare");
-        _;
-    }
+    /* Account for CURRENT OWNERSHIP given the month. Note this
+    differs from typical ERC721 balanceOf / ownerOf */
     function balanceOf(address owner) public view virtual override needsTimeshareMonths returns (uint256){
         uint256 numTSMonthsOwned = _NFTimeshareMonths.balanceOf(owner);
         uint256 curMonth = block.timestamp.getMonth()-1;
@@ -154,31 +124,83 @@ contract NFTimeshare is Initializable, ERC721EnumerableUpgradeable, ERC721Holder
         return _NFTimeshareMonths.ownerOf(timeshareMonths[curMonth]);
     }
 
-    function safeTransferFrom(address from, address to, uint256 tokenId) public override disallowed {
+
+    /*NFT METADATA methods*/
+    function contractURI() public view returns (string memory) {
+      return "http://www.nftimeshares.fun/timeshareprojectmetadata";
+    }
+
+    function _baseURI() internal view virtual override returns (string memory) {
+      return "http://www.nftimeshares.fun/timeshare/";
+    }
+    function underlyingTokenURI(uint256 tokenId) public view virtual needsTimeshareMonths returns (string memory) {
+        UnderlyingNFT memory underlying = _wrappedNFTs[tokenId];
+        string memory retval = IERC721MetadataUpgradeable(underlying._contractAddr).tokenURI(underlying._tokenId);
+        return retval;
+    }
+
+    /* Dealing with wrapped tokens */
+    function getWrappedNFT(uint256 tokenId) public view returns (address, uint256) {
+        require(_exists(tokenId), "Timeshare: asked for wrappedNFT of nonexistent token");
+        UnderlyingNFT memory underlying = _wrappedNFTs[tokenId];
+        return (underlying._contractAddr, underlying._tokenId);
+    }
+    function getTokenIdForUnderlyingNFT(address addr, uint256 externalTokenId) public view returns (uint256) {
+      return _tokenIdForUnderlying[addr][externalTokenId];
+    }
+
+    function setNFTimeshareMonthAddress(address _addr) public onlyOwner {
+        _NFTimeshareMonths = NFTimeshareMonth(_addr);
+    }
+
+    function getNFTimeshareMonthAddress() public view returns (address) {
+      return address(_NFTimeshareMonths);
+    }
+
+
+    function _exists(uint256 tokenId) internal view virtual override returns (bool) {
+      return (_wrappedNFTs[tokenId]._contractAddr != address(0));
+    }
+
+
+    modifier needsTimeshareMonths {
+        require(address(_NFTimeshareMonths) != address(0x0), "NFTimeshare contract address hasn't been set up");
+        _;
+    }
+
+
+
+    /* OVERRIDDEN DISALLOWED METHODS. YOU TRADE TIMESHAREMONTHS, NOT TIMESHARES*/
+    modifier disallowed {
+        require(false, "Disallowed operation on NFTimeshare");
+        _;
+    }
+
+    function safeTransferFrom(address /*from*/, address /*to*/, uint256 /*tokenId*/) public override disallowed {
         // override block
         return;
     }
 
-    function transferFrom(address from, address to, uint256 tokenId) public override disallowed {
+    function transferFrom(address /*from*/, address /*to*/, uint256 /*tokenId*/) public override disallowed {
         // override block
         return;
     }
 
-    function approve(address to, uint256 tokenId) public virtual override disallowed {
+    function approve(address /*to*/, uint256 /*tokenId*/) public virtual override disallowed {
         // block
         return;
     }
 
-    function getApproved(uint256 tokenId) public view virtual override disallowed returns (address)  {
+    function getApproved(uint256 /*tokenId*/) public view virtual override disallowed returns (address)  {
         return address(0);
     }
-    function setApprovalForAll(address operator, bool _approved) public virtual override disallowed {
+    function setApprovalForAll(address /*operator*/, bool /*_approved*/) public virtual override disallowed {
         return;
     }
-    function isApprovedForAll(address owner, address operator) public view virtual override disallowed returns (bool) {
+    function isApprovedForAll(address /*owner*/, address /*operator*/) public view virtual override disallowed returns (bool) {
         return false;
     }
-    function safeTransferFrom(address from, address to, uint256 tokenId, bytes memory data) public virtual override disallowed {
+    function safeTransferFrom(address /*from*/, address /*to*/, uint256 /*tokenId*/, bytes memory /*data*/) public virtual override disallowed {
         return;
     }
 

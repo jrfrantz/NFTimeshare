@@ -1,6 +1,13 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.7.0 <0.9.0;
+/*
+_____ _                     _                                         _   _
+/__   (_)_ __ ___   ___  ___| |__   __ _ _ __ ___    /\/\   ___  _ __ | |_| |__  ___
+ / /\/ | '_ ` _ \ / _ \/ __| '_ \ / _` | '__/ _ \  /    \ / _ \| '_ \| __| '_ \/ __|
+/ /  | | | | | | |  __/\__ \ | | | (_| | | |  __/ / /\/\ \ (_) | | | | |_| | | \__ \
+\/   |_|_| |_| |_|\___||___/_| |_|\__,_|_|  \___| \/    \/\___/|_| |_|\__|_| |_|___/
 
+*/
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
@@ -43,6 +50,7 @@ contract NFTimeshareMonth is Initializable, ERC721EnumerableUpgradeable, Ownable
             assert(allMonths[i] > 0); // shouldn't be any empties
         }
         assert(false); // couldn't find month for tokenId
+        return 13;
     }
 
     // for opensea https://docs.opensea.io/docs/contract-level-metadata
