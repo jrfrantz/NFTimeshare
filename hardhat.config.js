@@ -9,7 +9,7 @@ require("@nomiclabs/hardhat-ethers");
 require('@openzeppelin/hardhat-upgrades');
 
 const { RINKEBY_ALCHEMY_KEY_URL, RINKEBY_MNEMONIC, ETHERSCAN_API_KEY } = require('./secrets.json').rinkeby;
-
+const { ALCHEMY_KEY_URL } = require('./secrets.json').mainnet;
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
@@ -26,6 +26,9 @@ module.exports = {
        url: `${RINKEBY_ALCHEMY_KEY_URL}`,
        accounts:
         { mnemonic: RINKEBY_MNEMONIC}
+     },
+     mainnet: {
+       url: `${ALCHEMY_KEY_URL}`
      }
   },
   etherscan: {
