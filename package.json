@@ -10,7 +10,7 @@
     "build-client": "cd dapp && npm run build",
     "client": "cd dapp && npm run start",
     "server": "cd metadata-api-nodejs && npm run start",
-    "heroku-postbuild": "npm install && cd dapp && npm run build",
+    "heroku-postbuild": "cd dapp && npm install && npm run build",
     "server-prod": "cd metadata-api-nodejs && npm run start-prod",
     "prod": "concurrently --kill-others-on-fail \"npm run build-client\" \"npm run server-prod\"",
     "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
