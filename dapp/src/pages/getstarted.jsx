@@ -7,16 +7,16 @@ import TestNFTArtifact from "../contracts/TestNFT.json"
 import NFTimeshareArtifact from "../contracts/NFTimeshare.json"
 import NFTimeshareMonthArtifact from "../contracts/NFTimeshareMonth.json"
 //import { ConnectWallet } from '../components/connectwallet'
-import { DepositRedeemExplainer } from "../components2/depositredeemexplainer"
-import { Redeemable } from '../components2/redeemable'
-import { Depositable } from '../components2/depositable'
-import { DepositModal } from '../components2/depositmodal'
-import { RedeemModal } from '../components2/redeemmodal'
+import { DepositRedeemExplainer } from "../components/depositredeemexplainer"
+import { Redeemable } from '../components/redeemable'
+import { Depositable } from '../components/depositable'
+import { DepositModal } from '../components/depositmodal'
+import { RedeemModal } from '../components/redeemmodal'
 import ERC721abi from "../contracts/ERC721abi.json"
 import { Modal, Toast, Alert } from 'react-bootstrap'
-import { Credits } from '../components2/credits'
-import {TransactionAlerts } from '../components2/transactionalerts'
-import { NoWalletDetected } from '../components2/nowalletdetected'
+import { Credits } from '../components/credits'
+import {TransactionAlerts } from '../components/transactionalerts'
+import { NoWalletDetected } from '../components/nowalletdetected'
 
 const GetStarted = () => {
   const [address, setAddress] = useState("");
@@ -172,7 +172,7 @@ const GetStarted = () => {
       );
       // TODO check if already approved to avoid needing to do so again
       var approvalTx = await erc721Contract.setApprovalForAll(contractAddress.NFTimeshare, true);
-      
+
       var tx = await nftimeshare.deposit(
         externalContract,
         externalTokenId,

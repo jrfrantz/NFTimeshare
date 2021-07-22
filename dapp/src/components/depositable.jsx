@@ -31,11 +31,11 @@ export const Depositable = (props) => {
       { getHeading() }
       <Row className='mx-2'>
         {props.nfts.map((nft, i) => {
-          
+
           return (
-            <Col md='6' lg='4' className='d-flex justify-content-center'>
+            <Col md='6' lg='4' className='d-flex justify-content-center' key={`deposit_card_${i}`}>
               <a onClick={() => props.onClickDeposit(nft)}>
-                <Card className='nft-card my-3 shadow' key={`deposit_card_${i}`}>
+                <Card className='nft-card my-3 shadow'>
                   <Card.Header className='deposit-nft-header'>
                     <Card.Title className='text-center'>
                       {nft.name}

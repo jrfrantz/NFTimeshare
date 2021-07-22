@@ -3,7 +3,7 @@ const path = require('path')
 const { ethers } = require("ethers");
 const axios = require('axios');
 const PORT = process.env.PORT || 5000
-const alchemyKeyOnly = process.env.ALCHEMY_KEY || require('../secrets.json').rinkeby.RINKEBY_ALCHEMY_KEY_ONLY;
+const RINKEBY_ALCHEMY_KEY_ONLY = process.env.ALCHEMY_KEY || require('../secrets.json').rinkeby.RINKEBY_ALCHEMY_KEY_ONLY;
 const OPENSEA_API_KEY = process.env.OPENSEA_API_KEY || require('../secrets.json').rinkeby.OPENSEA_API_KEY;
 const PROD_NFTIMESHARES_WALLET_ADDR = process.env.PROD_NFTIMESHARES_WALLET_ADDR || require('../secrets.json').rinkeby.PROD_NFTIMESHARES_WALLET_ADDR
 const NFTimeshareArtifact      = require("./src/contracts/NFTimeshare.json");
@@ -29,7 +29,7 @@ app.get('/timeshareprojectmetadata', function(req,res) {
     "seller_fee_basis_points": 0,
     "fee_recipient": "0x0000000000000000000000000000000000000000"
   })
-})
+});
 app.get('/timesharemonthprojectmetadata', function(req,res) {
   res.json({
     "name": "NFTimeshares",
@@ -39,7 +39,7 @@ app.get('/timesharemonthprojectmetadata', function(req,res) {
     "seller_fee_basis_points": 0,
     "fee_recipient": "0x0000000000000000000000000000000000000000"
   })
-})
+});
 // need one for timeshare and one for timesharemonth
 app.get('/timesharemonth/:token_id', async function(req, res) {
   // 1/ get parent nft's tokenId for this timeshare
@@ -230,7 +230,7 @@ app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
     const ALL_NFTIMESHARES_URL = `https://rinkeby-api.opensea.io/api/v1/assets?asset_contract_address=${contractAddress.NFTimeshare.toLowerCase()}&order_by=token_id&order_direction=desc&offset=${offset}&limit=21`;
     console.log(ALL_NFTIMESHARES_URL);
     const MOCK_FOUNDATION_URL = `https://api.opensea.io/api/v1/assets?asset_contract_address=0x3B3ee1931Dc30C1957379FAc9aba94D1C48a5405&order_direction=desc&offset=${offset}&limit=21`;
-    axios.get(ALL_NFTIMESHARES_URL, OPENSEA_HEADER).then(function(response) {
+    axios.get(MOCK_FOUNDATION_URL, OPENSEA_HEADER).then(function(response) {
       if (response.status !== 200) {
         res.json(response);
         return;
@@ -339,7 +339,7 @@ function urlify(url) {
 }
 
 async function setupContracts() {
-  provider = new ethers.providers.AlchemyProvider("rinkeby", alchemyKeyOnly);
+  provider = new ethers.providers.AlchemyProvider("rinkeby", RINKEBY_ALCHEMY_KEY_ONLY);
   nftimeshare = new ethers.Contract(
     contractAddress.NFTimeshare,
     NFTimeshareArtifact.abi,

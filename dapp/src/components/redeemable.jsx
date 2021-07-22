@@ -37,9 +37,9 @@ export const Redeemable = (props) => {
       <Row className='mx-2'>
         {props.nfts.map((nft, i) => {
           return (
-            <Col md='6' lg='4' className='d-flex justify-content-center'>
+            <Col md='6' lg='4' className='d-flex justify-content-center' key={`deposit_card_${i}`}>
               <a onClick={() => props.onClickRedeem(nft)}>
-                <Card className='nft-card my-3 shadow' key={`deposit_card_${i}`}>
+                <Card className='nft-card my-3 shadow'>
                   <Card.Header className='text-muted'>
                     < Calendar3 /> {nft.month}
                   </Card.Header>

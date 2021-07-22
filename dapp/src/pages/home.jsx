@@ -3,11 +3,11 @@ import { ethers } from 'ethers'
 import SmoothScroll from 'smooth-scroll'
 import contractAddress from "../contracts/contract-address.json"
 
-import { NFTCardDeck } from '../components2/nftcarddeck';
-import { TimeshareJumbotron } from "../components2/timesharejumbotron";
-import { HowItWorks } from "../components2/howitworks";
-import { Credits } from "../components2/credits";
-import { ChooseMonthModal } from '../components2/choosemonthmodal'
+import { NFTCardDeck } from '../components/nftcarddeck';
+import { TimeshareJumbotron } from "../components/timesharejumbotron";
+import { HowItWorks } from "../components/howitworks";
+import { Credits } from "../components/credits";
+import { ChooseMonthModal } from '../components/choosemonthmodal'
 import axios from 'axios'
 
 
