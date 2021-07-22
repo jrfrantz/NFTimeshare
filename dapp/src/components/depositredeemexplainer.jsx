@@ -8,7 +8,7 @@ export const DepositRedeemExplainer = (props) => {
       contact us
     </a>
   const GITHUB_HREF =
-    <a href='https://github.com/jrfrantz/NFTimeshares'
+    <a href='https://github.com/jrfrantz/NFTimeshare'
       target="_blank" rel="noopener noreferrer">
       here
     </a>
@@ -44,6 +44,14 @@ export const DepositRedeemExplainer = (props) => {
                     <b>Redeem</b> the underlying asset by giving back all
                     of the 12 timeshares. You must own or operate all 12 timeshares
                     to get back the original NFT.
+                </p>
+                <p>
+                    <b>Timeshare month tokens</b>  support a <span className='text-monospace'>month</span>
+                    {' '}call on the blockchain, shows its month in its title
+                    {' '}<span className='font-italic'>("Mona Lisa [January]")</span>
+                    , and calls to <span className='text-monospace'>ownerOf()</span>
+                    {' '} on the parent asset return whomever owns the current
+                    month token.
                 </p>
                 <p className='text-muted'>
                     All code is open source and can be viewed {GITHUB_HREF}.

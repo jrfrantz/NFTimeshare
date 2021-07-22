@@ -6,11 +6,11 @@ export const Credits = (props) => {
       <Breadcrumb.Item active>
         NFT Timeshares
       </Breadcrumb.Item>
-      <Breadcrumb.Item href='https://twitter.com/therealjfrantz'>
-        Twitter
-      </Breadcrumb.Item>
       <Breadcrumb.Item href='https://github.com/jrfrantz/NFTimeshare'>
         Github
+      </Breadcrumb.Item>
+      <Breadcrumb.Item href='https://discord.gg/Rs9kFZFfFe'>
+        Discord
       </Breadcrumb.Item>
     </Breadcrumb>
   )

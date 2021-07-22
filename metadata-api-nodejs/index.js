@@ -2,6 +2,7 @@ const express = require('express')
 const path = require('path')
 const { ethers } = require("ethers");
 const axios = require('axios');
+const enforce = require('express-sslify');
 const PORT = process.env.PORT || 5000
 const RINKEBY_ALCHEMY_KEY_ONLY = process.env.ALCHEMY_KEY || require('../secrets.json').rinkeby.RINKEBY_ALCHEMY_KEY_ONLY;
 const OPENSEA_API_KEY = process.env.OPENSEA_API_KEY || require('../secrets.json').rinkeby.OPENSEA_API_KEY;
@@ -15,6 +16,7 @@ const app = express()
   .set('port', PORT)
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
+app.use(enforce.HTTPS({ trustProtoHeader: true }))
 
 const OPENSEA_HEADER = {headers: {'X-API-KEY': OPENSEA_API_KEY}};
 
