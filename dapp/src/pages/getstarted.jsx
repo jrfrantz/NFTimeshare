@@ -141,11 +141,8 @@ const GetStarted = () => {
   }
   const handleCloseModal = () => {
     setSelectedNFT(null);
-    // clear back out all the pending deposits probably
-    // add an input of the nft so that hte modal can pass the info about which to remove
-    // maybe just clear it out if the state was error or
+
   }
-  // TODO figure out toasts on
 
   // should be triggered when someone presses Lets do it the modal
   async function confirmDepositNft(externalContract, externalTokenId) {

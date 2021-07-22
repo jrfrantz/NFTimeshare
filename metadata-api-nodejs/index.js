@@ -201,29 +201,7 @@ app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
         nextOffset: nextOffset
       });
     });
-
-  /*
-  var balance = await nftimesharemonth.balanceOf(ownerAddr);
-  var tokens = [];
-  for (let i = offset ; i < Math.min(balance, offset+21); i++ ) {
-    var token = await nftimesharemonth.tokenOfOwnerByIndex(ownerAddr, i);
-    var month = await nftimesharemonth.month(token.toString());
-    var url   = await nftimesharemonth.tokenURI(token.toString());
-    var metadata = await axios.get(urlify(url));
-
-    tokens.push({
-      token_id: token.toString(),
-      month: monthName(month),
-      media: media ? media.toString() : null,
-      name: name.toString()
-    });
-  }
-  var nextOffset = (offset+20 < balance) ? offset+20 : -1;
-  res.json({
-    nfts: tokens.slice(0,20),
-    nextOffset: nextOffset
-  });*/
-});
+  });
 
   app.get('/api/alltimeshares/:offset?', async function (req, res) {
     const offset = req.params.offset ? parseInt(req.params.offset) : 0;
@@ -312,12 +290,11 @@ app.get('/api/monthTokensForTimeshare/:timeshareTokenId', async function (req, r
   });
   res.json({
     nfts: [...monthLinks],
-  })
-
+  });
 });
 
 app.use(express.static(path.join(__dirname, "..", "dapp/build")));
-app.use(express.static("../dapp/public"));
+//app.use(express.static("../dapp/public"));
 app.get('/*', function (req, res) {
   res.sendFile(path.join(__dirname, "../dapp/build", "index.html"));
 });

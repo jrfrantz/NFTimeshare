@@ -27,12 +27,12 @@
     "express",
     "timeshare"
   ],
-  "author": "Nomic Labs",
+  "author": "Jacob Frantz",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/nomiclabs/hardhat-hackathon-boilerplate/issues"
+    "url": "https://github.com/jrfrantz/NFTimeshare/issues"
   },
-  "homepage": "https://github.com/nomiclabs/hardhat-hackathon-boilerplate#readme",
+  "homepage": "http://www.nftimeshares.fun",
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-etherscan": "^2.1.4",
