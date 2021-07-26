@@ -21,10 +21,11 @@ async function main() {
   );
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
-
+  return; // remove when deploying to mainnet
   const NFTimeshare = await ethers.getContractFactory("NFTimeshare");
   //const nftimeshare = await NFTimeshare.deploy();
   const nftimeshare = await upgrades.deployProxy(NFTimeshare, []);
+  console.log(nftimeshare);
   await nftimeshare.deployed();
 
   const NFTimeshareMonth = await ethers.getContractFactory("NFTimeshareMonth");

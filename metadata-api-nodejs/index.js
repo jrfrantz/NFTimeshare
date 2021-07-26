@@ -26,8 +26,8 @@ app.get('/timeshareprojectmetadata', function(req,res) {
   res.json({
     "name": "NFTimeshares",
     "description": "Turn any Ethereum ERC721 NFT into a Timeshare. Deposit an NFT to receive 12 timeshares of that NFT -- one for each month. Redeem the original NFT by giving back 12 timeshares of that NFT. Tokens from this contract represent the underlying (deposited) NFT.",
-    "image": "https://www.nftimeshares.fun/logo.png",
-    "external_link": "https://www.nftimeshares.fun",
+    "image": "http://www.nftimeshares.fun/logo.png",
+    "external_link": "http://www.nftimeshares.fun",
     "seller_fee_basis_points": 0,
     "fee_recipient": "0x0000000000000000000000000000000000000000"
   })
@@ -210,7 +210,7 @@ app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
     const ALL_NFTIMESHARES_URL = `https://rinkeby-api.opensea.io/api/v1/assets?asset_contract_address=${contractAddress.NFTimeshare.toLowerCase()}&order_by=token_id&order_direction=desc&offset=${offset}&limit=21`;
     console.log(ALL_NFTIMESHARES_URL);
     const MOCK_FOUNDATION_URL = `https://api.opensea.io/api/v1/assets?asset_contract_address=0x3B3ee1931Dc30C1957379FAc9aba94D1C48a5405&order_direction=desc&offset=${offset}&limit=21`;
-    axios.get(MOCK_FOUNDATION_URL, OPENSEA_HEADER).then(function(response) {
+    axios.get(ALL_NFTIMESHARES_URL, OPENSEA_HEADER).then(function(response) {
       if (response.status !== 200) {
         res.json(response);
         return;

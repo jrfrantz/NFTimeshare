@@ -96,8 +96,10 @@ contract NFTimeshare is Initializable, ERC721EnumerableUpgradeable, ERC721Holder
 
 
         _NFTimeshareMonths.burnTimeshareMonthsFor(msg.sender, tokenId);
-        IERC721Upgradeable(underlyingNFT._contractAddr).safeTransferFrom(address(this), _to, underlyingNFT._tokenId);
         _burn(tokenId);
+
+        IERC721Upgradeable(underlyingNFT._contractAddr).safeTransferFrom(address(this), _to, underlyingNFT._tokenId);
+
         emit Redeem(msg.sender, _to, underlyingNFT._contractAddr, underlyingNFT._tokenId, tokenId);
 
     }
@@ -177,17 +179,14 @@ contract NFTimeshare is Initializable, ERC721EnumerableUpgradeable, ERC721Holder
     }
 
     function safeTransferFrom(address /*from*/, address /*to*/, uint256 /*tokenId*/) public override disallowed {
-        // override block
         return;
     }
 
     function transferFrom(address /*from*/, address /*to*/, uint256 /*tokenId*/) public override disallowed {
-        // override block
         return;
     }
 
     function approve(address /*to*/, uint256 /*tokenId*/) public virtual override disallowed {
-        // block
         return;
     }
 
