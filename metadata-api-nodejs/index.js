@@ -286,7 +286,7 @@ app.get('/api/monthTokensForTimeshare/:timeshareTokenId', async function (req, r
   console.log(monthIds);
   var monthLinks = monthIds.map((monthTokenId, i) => {
     return {
-      asset_url: `https://opensea.io/assets/${nftimesharemonth.address}/${monthTokenId}`,
+      asset_url: `https://testnets.opensea.io/assets/${nftimesharemonth.address}/${monthTokenId}`,
       month    :  monthName(i)
     }
   });
