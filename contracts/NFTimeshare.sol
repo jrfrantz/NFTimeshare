@@ -68,6 +68,10 @@ contract NFTimeshare is Initializable, ERC721EnumerableUpgradeable, ERC721Holder
 
     // given an an NFT (contract + tokenId), wrap it and mint it into timeshares.
     // this contract must be approved to operate it. _to must be able to receive erc721s.
+    // @param _underlying the NFT contract address... 0xabc...
+    // @param _underlyingTokenId token Id for use w external NFT contract
+    // @param _from account currently owns the NFT
+    // @param _to account that will receive the timesharemonths
     function deposit(address _underlying, uint256 _underlyingTokenId, address _from, address _to) public needsTimeshareMonths {
         require(_underlying != address(_NFTimeshareMonths), "Deposit: Cant make timeshares out of timeshares");
         _tokenIds.increment();
@@ -84,9 +88,10 @@ contract NFTimeshare is Initializable, ERC721EnumerableUpgradeable, ERC721Holder
         emit Deposit(_from, msg.sender, _to, _underlying, _underlyingTokenId, newTokenId);
     }
 
-    // redeem a wrapped NFT if you own all the timeshares.
-    // approves sender to withdraw NFT but owner still needs to initiate transfer
-    // TODO split redeem into redeem + withdraw ?
+    // redeem a wrapped NFT for the underlying NFT if you own all the timeshares.
+    // @param tokenId -- the tokenId (in NFTimeshare's mapping) of the Timeshare
+    // @param _to -- account that will receive the unwrapped external nft
+    // @note you can look up the timeshare TokenId with getTokenIdForUnderlyingNFT
     function redeem(uint256 tokenId, address _to) public virtual needsTimeshareMonths {
         UnderlyingNFT memory underlyingNFT = _wrappedNFTs[tokenId];
         require(underlyingNFT._contractAddr != address(0) && underlyingNFT._tokenId != 0, "Redeem Timeshare: Nonexistent tokenId");
