@@ -1,5 +1,6 @@
 node_modules
 .idea
+terminal_output.txt
 
 #Hardhat files
 cache

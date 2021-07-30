@@ -1,6 +1,5 @@
 const { ethers, upgrades } = require("hardhat");
 
-
 // This is a script for deploying your contracts. You can adapt it to deploy
 // yours, or create new ones.
 async function main() {
@@ -21,15 +20,13 @@ async function main() {
   );
 
   console.log("Account balance:", (await deployer.getBalance()).toString());
-  return; // remove when deploying to mainnet
+
   const NFTimeshare = await ethers.getContractFactory("NFTimeshare");
-  //const nftimeshare = await NFTimeshare.deploy();
   const nftimeshare = await upgrades.deployProxy(NFTimeshare, []);
-  console.log(nftimeshare);
   await nftimeshare.deployed();
+  //const nftimeshare = NFTimeshare.attach("0xB1937B1e3f9CC41F93B9361D7496A49461b47d15")
 
   const NFTimeshareMonth = await ethers.getContractFactory("NFTimeshareMonth");
-  //const nftimesharemonth = await NFTimeshareMonth.deploy();
   const nftimesharemonth = await upgrades.deployProxy(NFTimeshareMonth, []);
   await nftimesharemonth.deployed();
 
@@ -68,6 +65,7 @@ function saveFrontendFiles(tokens, location) {
   );
 
   const NFTimeshareArtifact = artifacts.readArtifactSync("NFTimeshare");
+
   const NFTimeshareMonthArtifact = artifacts.readArtifactSync("NFTimeshareMonth");
 
   fs.writeFileSync(
