@@ -18,8 +18,6 @@ export const TimeshareJumbotron = (props) => {
               </h5>
               <Badge variant='dark' pill
                 className='beta-badge ml-1 py-1 '>Beta</Badge>
-              <Badge variant='warning' pill
-                className='beta-badge ml-1 py-1 '>Rinkeby</Badge>
           </Col>
         </Row>
         <Row >

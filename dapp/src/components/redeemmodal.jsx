@@ -22,13 +22,13 @@ export const RedeemModal = (props) => {
         return {
           disabled: true,
           variant: "outline-success",
-          text: "Successfuly redeemed!"
+          text: "Redeem transaction sent!"
         };
       case "ERROR":
         return {
           disabled: true,
           variant: "outline-danger",
-          text: "Error depositing. Try refresh"
+          text: "Error Redeeming. Try refreshing"
         };
       default:
         return {
@@ -42,9 +42,15 @@ export const RedeemModal = (props) => {
       <Modal.Header closeButton>
         <Modal.Title>Redeem your NFT</Modal.Title>
       </Modal.Header>
+      <Image src={nft.media} width='100%'></Image>
       <Modal.Body>
-        <Image src={nft.media} width='100%'></Image>
-        You must own all 12 timeshares to redeem the media.
+        <p>You must own all 12 timeshares to redeem the media.</p>
+        <p class='text-muted'>
+            <a href={nft.permalink} class='text-muted'
+              target="_blank" rel="noopener noreferrer">
+            View on Opensea ↗
+            </a>
+          </p>
       </Modal.Body>
       <Modal.Footer>
         <Button {...getButtonProps(pendingStatus.status)}

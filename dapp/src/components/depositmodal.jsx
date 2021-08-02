@@ -114,7 +114,8 @@ export const DepositModal = (props) => {
           <p>Turn this NFT into a Timeshare. In exchange for this token, you'll get back
           12 NFTs, one for each month.</p>
           <p class='text-muted'>
-            <a href={nft.permalink} target="_blank" rel="noopener noreferrer">
+            <a href={nft.permalink} class='text-muted'
+              target="_blank" rel="noopener noreferrer">
             View on Opensea ↗
             </a>
           </p>

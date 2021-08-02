@@ -26,7 +26,6 @@ export const DepositRedeemExplainer = (props) => {
               <h1 className='display-4'>Deposit or Redeem Timeshares {' '}
                 <small>
                   <Badge variant='warning' size='sm'>BETA</Badge>
-                {' '}<Badge variant='secondary' size='sm'>Rinkeby</Badge>
                 </small>
             </h1>
 
