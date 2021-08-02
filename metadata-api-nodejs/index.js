@@ -2,11 +2,12 @@ const express = require('express')
 const path = require('path')
 const { ethers } = require("ethers");
 const axios = require('axios');
-const enforce = require('express-sslify');
+//const enforce = require('express-sslify');
 const PORT = process.env.PORT || 5000
-const RINKEBY_ALCHEMY_KEY_ONLY = process.env.ALCHEMY_KEY || require('../secrets.json').rinkeby.RINKEBY_ALCHEMY_KEY_ONLY;
-const OPENSEA_API_KEY = process.env.OPENSEA_API_KEY || require('../secrets.json').rinkeby.OPENSEA_API_KEY;
-const PROD_NFTIMESHARES_WALLET_ADDR = process.env.PROD_NFTIMESHARES_WALLET_ADDR || require('../secrets.json').rinkeby.PROD_NFTIMESHARES_WALLET_ADDR
+const RINKEBY_ALCHEMY_KEY_ONLY = process.env.RINKEBY_ALCHEMY_KEY || require('../secrets.json').rinkeby.RINKEBY_ALCHEMY_KEY_ONLY;
+const ALCHEMY_KEY_ONLY = process.env.ALCHEMY_KEY || require('../secrets.json').mainnet.ALCHEMY_KEY_ONLY
+const OPENSEA_API_KEY = process.env.OPENSEA_API_KEY || require('../secrets.json').mainnet.OPENSEA_API_KEY;
+const PROD_NFTIMESHARES_WALLET_ADDR = process.env.PROD_NFTIMESHARES_WALLET_ADDR || require('../secrets.json').mainnet.PROD_NFTIMESHARES_WALLET_ADDR
 const NFTimeshareArtifact      = require("./src/contracts/NFTimeshare.json");
 const NFTimeshareMonthArtifact = require("./src/contracts/NFTimeshareMonth.json");
 const contractAddress          = require("./src/contracts/contract-address.json");
@@ -16,12 +17,15 @@ const app = express()
   .set('port', PORT)
   .set('views', path.join(__dirname, 'views'))
   .set('view engine', 'ejs')
-app.use(enforce.HTTPS({ trustProtoHeader: true }))
+//app.use(enforce.HTTPS({ trustProtoHeader: true }))
 
 const OPENSEA_HEADER = {headers: {'X-API-KEY': OPENSEA_API_KEY}};
 
 setupContracts();
 
+/**
+ * METADATA METHODS
+ */
 app.get('/timeshareprojectmetadata', function(req,res) {
   res.json({
     "name": "NFTimeshares",
@@ -36,8 +40,8 @@ app.get('/timesharemonthprojectmetadata', function(req,res) {
   res.json({
     "name": "NFTimeshares",
     "description": "Turn any Ethereum ERC721 NFT into a Timeshare. Deposit an NFT to receive 12 timeshares of that NFT -- one for each month. Redeem the original NFT by giving back 12 timeshares of that NFT. Tokens from this contract represent ownership of one month of a timeshared NFT.",
-    "image": "https://www.nftimeshares.fun/logo.png",
-    "external_link": "https://www.nftimeshares.fun",
+    "image": "http://www.nftimeshares.fun/logo.png",
+    "external_link": "http://www.nftimeshares.fun",
     "seller_fee_basis_points": 0,
     "fee_recipient": "0x0000000000000000000000000000000000000000"
   })
@@ -124,14 +128,15 @@ app.get('/api/test', async function(req,res) {
   console.log("hit /api/test backend");
   res.send("nice");
 })
-
-// to deposit
+/**
+ * API METHODS
+ */
+// DEPOSITABLE
 app.get('/api/ownednfts/:owner/:offset?', async function (req, res) {
-  console.log('reached api ownednfts', req.params);
   try {
     const ownerAddr = req.params.owner;
     const offset = req.params.offset ? parseInt(req.params.offset) : 0;
-    const OWNED_ASSETS_URL = `https://rinkeby-api.opensea.io/api/v1/assets?owner=${ownerAddr}&order_direction=desc&offset=${offset}&limit=21`;
+    const OWNED_ASSETS_URL = `https://api.opensea.io/api/v1/assets?owner=${ownerAddr}&order_direction=desc&offset=${offset}&limit=21`;
     axios.get(OWNED_ASSETS_URL, OPENSEA_HEADER).then(function(response) {
       if (response.status !== 200) {
         res.send("Error in response from Opensea: ", response);
@@ -146,7 +151,6 @@ app.get('/api/ownednfts/:owner/:offset?', async function (req, res) {
         && (nft.asset_contract.address.toLowerCase() !==
           contractAddress.NFTimeshare.toLowerCase())
       );
-      console.log('after filter', assets.length);
       assets = assets.map(function (nft)  {
         nft.name = nft.name  || `Token ${nft.token_id} from contract at ${nft.asset_contract.address}`;
         //nft.media = nft.media || nft.image_url || nft.image || nft.image_data || nft.animation_url || nft.youtube_url;
@@ -154,7 +158,6 @@ app.get('/api/ownednfts/:owner/:offset?', async function (req, res) {
         nft.external_contract = nft.asset_contract.address
         return nft;
       });
-      console.log('after second map', assets.length);
       res.json({
         nfts: assets.slice(0,20),
         nextOffset: nextOffset
@@ -169,15 +172,16 @@ app.get('/api/ownednfts/:owner/:offset?', async function (req, res) {
   }
 });
 
-// to redeem
+// REDEEMABLE
 app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
   const ownerAddr = req.params.owner;
-  const offset = req.params.offset ? parseInt(req.params.offset) : 0;
+  const offset = req.params.offset ? parseInt(req.params.offset) : 1; // TokenIDs start at 1
   console.log("Owned timesharemonths " + ownerAddr + ", " + req.params.offset);
   if (!ownerAddr) {
     res.json("Error: no owner specified in request to /ownedtimesharemonths api");
   }
   var tokens = await nftimesharemonth.tokensOf(ownerAddr, offset, 21);
+  console.log("Blockchain returned ", tokens);
   var nextOffset = tokens.length > 20 ? offset + 20 : -1;
   tokens = tokens.slice(0,20).map(({tokenId, month, tokenURI}) => {
     return {
@@ -186,8 +190,10 @@ app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
       metadataURL: tokenURI,
       req: axios.get(urlify(tokenURI))
     }});
+  console.log("Assigned tokens to", tokens);
   Promise.all(tokens.map((token) => token.req))
     .then(function (results) {
+      //console.log("Axios returned ", results);
       results.forEach( (metadata, index) => {
         var media;
         var name;
@@ -207,10 +213,10 @@ app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
 
   app.get('/api/alltimeshares/:offset?', async function (req, res) {
     const offset = req.params.offset ? parseInt(req.params.offset) : 0;
-    const ALL_NFTIMESHARES_URL = `https://rinkeby-api.opensea.io/api/v1/assets?asset_contract_address=${contractAddress.NFTimeshare.toLowerCase()}&order_by=token_id&order_direction=desc&offset=${offset}&limit=21`;
+    const ALL_NFTIMESHARES_URL = `https://api.opensea.io/api/v1/assets?asset_contract_address=${contractAddress.NFTimeshare.toLowerCase()}&order_by=token_id&order_direction=desc&offset=${offset}&limit=21`;
     console.log(ALL_NFTIMESHARES_URL);
     const MOCK_FOUNDATION_URL = `https://api.opensea.io/api/v1/assets?asset_contract_address=0x3B3ee1931Dc30C1957379FAc9aba94D1C48a5405&order_direction=desc&offset=${offset}&limit=21`;
-    axios.get(MOCK_FOUNDATION_URL, OPENSEA_HEADER).then(function(response) {
+    axios.get(ALL_NFTIMESHARES_URL, OPENSEA_HEADER).then(function(response) {
       if (response.status !== 200) {
         res.json(response);
         return;
@@ -245,7 +251,7 @@ app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
 // for homescreen
 app.get('/api/alltimesharemonths/:offset?', async function (req, res) {
   const offset = req.params.offset ? parseInt(req.params.offset) : 0;
-  const ALL_NFTIMESHARES_URL = `https://rinkeby-api.opensea.io/api/v1/assets?asset_contract_address=${contractAddress.NFTimeshareMonth.toLowerCase()}&order_by=token_id&order_direction=desc&offset=${offset}&limit=21`;
+  const ALL_NFTIMESHARES_URL = `https://api.opensea.io/api/v1/assets?asset_contract_address=${contractAddress.NFTimeshareMonth.toLowerCase()}&order_by=token_id&order_direction=desc&offset=${offset}&limit=21`;
   console.log(ALL_NFTIMESHARES_URL);
   const MOCK_FOUNDATION_URL = `https://api.opensea.io/api/v1/assets?asset_contract_address=0x3B3ee1931Dc30C1957379FAc9aba94D1C48a5405&order_direction=desc&offset=${offset}&limit=21`;
   axios.get(MOCK_FOUNDATION_URL, OPENSEA_HEADER).then(function(response) {
@@ -280,7 +286,7 @@ app.get('/api/alltimesharemonths/:offset?', async function (req, res) {
   }).catch((error) => {
   });
 });
-
+// for homepage's modal
 app.get('/api/monthTokensForTimeshare/:timeshareTokenId', async function (req, res) {
   var monthIds = await nftimesharemonth.getTimeshareMonths(req.params.timeshareTokenId);
   console.log(monthIds);
@@ -318,7 +324,7 @@ function urlify(url) {
 }
 
 async function setupContracts() {
-  provider = new ethers.providers.AlchemyProvider("rinkeby", RINKEBY_ALCHEMY_KEY_ONLY);
+  provider = new ethers.providers.AlchemyProvider("homestead", ALCHEMY_KEY_ONLY);
   nftimeshare = new ethers.Contract(
     contractAddress.NFTimeshare,
     NFTimeshareArtifact.abi,

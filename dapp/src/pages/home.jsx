@@ -22,7 +22,6 @@ export const scroll = new SmoothScroll('a[href*="#"]', {
 })
 const Home = () => {
   const [address, setAddress] = useState("");
-  const [testNFT, setTestNFT] = useState({});
 
   const [publicTimeshares, setPublicTimeshares] = useState([])
   const [publicTimesharesOffset, setPublicTimesharesOffset] = useState(0);
@@ -68,13 +67,6 @@ const Home = () => {
     const [selectedAddress] = await window.ethereum.enable();
     setAddress(selectedAddress);
     let prov = new ethers.providers.Web3Provider(window.ethereum);
-    let tNFT = new ethers.Contract(
-      contractAddress.TestNFT,
-      TestNFTArtifact.abi,
-      prov.getSigner(0)
-    );
-    console.log()
-    setTestNFT(tNFT);
   }
 
   const handleTimeshareSelection = (parentNft) => {

@@ -1,5 +1,7 @@
 {
   "interface": [
-    "function setApprovalForAll(address to, bool approved)"
+    "function setApprovalForAll(address to, bool approved)",
+    "function getApproved(uint256 tokenId) public view virtual override returns (address)",
+    "function isApprovedForAll(address owner, address operator) public view virtual override returns (bool)"
   ]
 }

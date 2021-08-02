@@ -167,9 +167,16 @@ const GetStarted = () => {
         ERC721abi.interface,
         new ethers.providers.Web3Provider(window.ethereum).getSigner(0)
       );
-      // TODO check if already approved to avoid needing to do so again
-      var approvalTx = await erc721Contract.setApprovalForAll(contractAddress.NFTimeshare, true);
-
+      console.log("NFTimeshare addr is ", contractAddress.NFTimeshare);
+      var approvedOperator = await erc721Contract.getApproved(externalTokenId);
+      var isApprovedForAll = await erc721Contract.isApprovedForAll(address, contractAddress.NFTimeshare);
+      console.log("Approved operator: ", approvedOperator);
+      console.log("Is approved for all?", isApprovedForAll);
+      if (approvedOperator !== contractAddress.NFTimeshare && !isApprovedForAll) {
+        console.log("Seeking permission")
+        var approvalTx = await erc721Contract.setApprovalForAll(contractAddress.NFTimeshare, true);
+      }
+      console.log("Permission obtained")
       var tx = await nftimeshare.deposit(
         externalContract,
         externalTokenId,

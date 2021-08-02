@@ -1,6 +1,7 @@
 node_modules
 .idea
 terminal_output.txt
+sidecontracts
 
 #Hardhat files
 cache
