@@ -28,7 +28,7 @@ export const TransactionAlerts = (props) => {
         alertProps.bg = "info"
         break;
       case "SUCCESS":
-        alertProps.status = "succeeded"
+        alertProps.status = "sent successfully"
         alertProps.bg = "success"
         break;
       case "ERROR":
