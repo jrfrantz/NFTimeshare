@@ -22,9 +22,14 @@ export const ChooseMonthModal = ({selection, clearFunc, monthLinks, ...props}) =
       <Modal.Body className='text-muted'>
         Opensea didn't return an image for this NFT. This usually happens for about an hour after a Timeshare (or any NFT) is created
         until Opensea checks the metadata. In the meanwhile you can {' '}
-        <a href={selection.token_metadata} class='link-muted'>
+        <a href={selection.token_metadata} class='link-muted'
+          target="_blank" rel="noopener noreferrer">
         view it in raw form
-        </a>.
+        </a> or {' '}
+        <a href={selection.permalink}
+          target="_blank" rel="noopener noreferrer">
+          manually request a refresh
+        </a> on Opensea.
       </Modal.Body>
 
       }
