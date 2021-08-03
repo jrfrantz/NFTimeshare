@@ -11,7 +11,9 @@ const PROD_NFTIMESHARES_WALLET_ADDR = process.env.PROD_NFTIMESHARES_WALLET_ADDR 
 const NFTimeshareArtifact      = require("./src/contracts/NFTimeshare.json");
 const NFTimeshareMonthArtifact = require("./src/contracts/NFTimeshareMonth.json");
 const contractAddress          = require("./src/contracts/contract-address.json");
+const SPECIAL_NFT_CONTRACTS    = ["0xabEFBc9fD2F806065b4f3C237d4b59D9A97Bcac7".toLowerCase()]
 let provider, nftimeshare, nftimesharemonth;
+let zoracontract; // special case contract
 
 const app = express()
   .set('port', PORT)
@@ -54,9 +56,26 @@ app.get('/timesharemonth/:token_id', async function(req, res) {
   try {
     const tokenId = req.params.token_id;
     console.log(tokenId);
-    var underlyingTokenURI = await nftimesharemonth.underlyingTokenURI(tokenId);
-    var monthStr = monthName(await nftimesharemonth.month(tokenId));
-    var parentId =           await nftimesharemonth.getParentTimeshare(tokenId);
+    var [underlyingTokenURI,
+      monthStr,
+      parentId] = await Promise.all([
+        nftimesharemonth.underlyingTokenURI(tokenId),
+        nftimesharemonth.month(tokenId),
+        nftimesharemonth.getParentTimeshare(tokenId),
+      ]);
+    monthStr = monthName(monthStr);
+
+    var [underlying_contract, underlying_tokenId] = await nftimeshare.getWrappedNFT(parentId);
+
+    let underlyingSpecialCaseImage;
+    if (SPECIAL_NFT_CONTRACTS.includes(underlying_contract.toLowerCase())) {
+      // zora represents their calls weird.
+      [underlyingTokenURI, underlyingSpecialCaseImage] = await Promise.all([
+        zoracontract.tokenMetadataURI(underlying_tokenId),
+        zoracontract.tokenURI(underlying_tokenId)
+      ]);
+    }
+
     var underlyingMetadata = await axios.get(underlyingTokenURI);
     if (underlyingMetadata.status !== 200) {
       res.send("Error in underlying NFT's metadata " + JSON.stringify(underlyingMetadata));
@@ -87,6 +106,11 @@ app.get('/timesharemonth/:token_id', async function(req, res) {
         " [NFT Timeshare] This NFT represents ownership for the month of " + monthStr + ". "
         + "Learn more at www.nftimeshares.fun";
 
+    if (underlyingSpecialCaseImage) {
+      underlyingMetadata.media = underlyingSpecialCaseImage;
+      underlyingMetadata.image = underlyingSpecialCaseImage;
+      underlyingMetadata.image_url = underlyingSpecialCaseImage
+    }
     res.json(underlyingMetadata);
   } catch (error) {
     console.error(error);
@@ -96,9 +120,24 @@ app.get('/timesharemonth/:token_id', async function(req, res) {
 
 app.get('/timeshare/:token_id', async function(req, res) {
   const tokenId = req.params.token_id;
-  const timeshareMonthIds  = await nftimesharemonth.getTimeshareMonths(tokenId);
-  const underlyingTokenURI = await nftimeshare.underlyingTokenURI(tokenId);
-  var   underlyingMetadata = await axios.get(underlyingTokenURI);
+  console.log("requested tokenid", tokenId);
+  let [timeshareMonthIds, 
+        underlyingTokenURI,
+        [underlying_contract, underlying_tokenId]] = await Promise.all([
+    nftimesharemonth.getTimeshareMonths(tokenId),
+    nftimeshare.underlyingTokenURI(tokenId),
+    nftimeshare.getWrappedNFT(tokenId)
+  ])
+  
+  let underlyingSpecialCaseImage;
+  if (SPECIAL_NFT_CONTRACTS.includes(underlying_contract.toLowerCase())) {
+    // fuck zora, which separates tokenURI (image) from tokenMetadataURI (json)
+    [underlyingTokenURI, underlyingSpecialCaseImage] = await Promise.all([
+      zoracontract.tokenMetadataURI(underlying_tokenId),
+      zoracontract.tokenURI(underlying_tokenId)]);
+  }
+  var underlyingMetadata = await axios.get(underlyingTokenURI);
+
   if (underlyingMetadata.status !== 200) {
     res.send("Error in underlying NFT's metadata " + JSON.stringify(underlyingMetadata));
     return;
@@ -121,6 +160,11 @@ app.get('/timeshare/:token_id', async function(req, res) {
       " This NFT is wrapped under timeshare. "
       + "Learn more at www.nftimeshares.fun";
 
+  if (underlyingSpecialCaseImage) {
+    underlyingMetadata.media = underlyingSpecialCaseImage;
+    underlyingMetadata.image = underlyingSpecialCaseImage;
+    underlyingMetadata.image_url = underlyingSpecialCaseImage
+  }
   res.json(underlyingMetadata);
 })
 
@@ -181,7 +225,6 @@ app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
     res.json("Error: no owner specified in request to /ownedtimesharemonths api");
   }
   var tokens = await nftimesharemonth.tokensOf(ownerAddr, offset, 21);
-  console.log("Blockchain returned ", tokens);
   var nextOffset = tokens.length > 20 ? offset + 20 : -1;
   tokens = tokens.slice(0,20).map(({tokenId, month, tokenURI}) => {
     return {
@@ -191,7 +234,6 @@ app.get('/api/ownedtimesharemonths/:owner/:offset?', async function (req, res) {
       permalink: `https://opensea.io/assets/${contractAddress.NFTimeshareMonth}/${tokenId.toString()}`,
       req: axios.get(urlify(tokenURI))
     }});
-  console.log("Assigned tokens to", tokens);
   Promise.all(tokens.map((token) => token.req))
     .then(function (results) {
       //console.log("Axios returned ", results);
@@ -336,4 +378,10 @@ async function setupContracts() {
     NFTimeshareMonthArtifact.abi,
     provider
   );
+  zoracontract = new ethers.Contract(
+    "0xabEFBc9fD2F806065b4f3C237d4b59D9A97Bcac7",
+    ["function tokenMetadataURI(uint256) view returns (string)",
+    "function tokenURI(uint256) view returns (string)"],
+    provider
+  )
 }

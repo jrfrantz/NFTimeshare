@@ -1,5 +1,6 @@
 import { Modal, Image, Badge, Container, Row, Col, Button, Spinner } from 'react-bootstrap'
 import { CalendarMonth, Calendar3 } from 'react-bootstrap-icons'
+import media_not_found from '../assets/NFT_NO_MEDIA.jpg'
 export const ChooseMonthModal = ({selection, clearFunc, monthLinks, ...props}) => {
 
   /*var monthnfts = [
@@ -8,6 +9,7 @@ export const ChooseMonthModal = ({selection, clearFunc, monthLinks, ...props}) =
   if (!selection) {
     return null;
   }
+  console.log(selection);
   return (
     <Modal show={!!selection} onHide={clearFunc} >
       <Modal.Header closeButton>
@@ -15,7 +17,17 @@ export const ChooseMonthModal = ({selection, clearFunc, monthLinks, ...props}) =
           Choose a Month
         </Modal.Title>
       </Modal.Header>
-      <Image src={selection.media} width='100%'/>
+      <Image src={selection.media ? selection.media : media_not_found} width='100%'/>
+      { !selection.media &&
+      <Modal.Body className='text-muted'>
+        Opensea didn't return an image for this NFT. This usually happens for about an hour after a Timeshare (or any NFT) is created
+        until Opensea checks the metadata. In the meanwhile you can {' '}
+        <a href={selection.token_metadata} class='link-muted'>
+        view it in raw form
+        </a>.
+      </Modal.Body>
+
+      }
     <Modal.Footer>
         <Container>
           <Row >
