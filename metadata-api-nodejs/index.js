@@ -155,7 +155,7 @@ app.get('/timeshare/:token_id', async function(req, res) {
     value      : timeshareMonthIds.map(id => {return id.toString()}).join(', ')
   })
 
-  underlyingMetadata.name = underlyingMetadata.name + " [Wrapped Timeshare]";
+  underlyingMetadata.name = underlyingMetadata.name + " 🗓🌞Timeshare⛷🗓";
   underlyingMetadata.description = underlyingMetadata.description +
       " This NFT is wrapped under timeshare. "
       + "Learn more at www.nftimeshares.fun";
