@@ -17,7 +17,9 @@ export const ChooseMonthModal = ({selection, clearFunc, monthLinks, ...props}) =
           Choose a Month
         </Modal.Title>
       </Modal.Header>
-      <Image src={selection.media ? selection.media : media_not_found} width='100%'/>
+      { selection.media.includes(".mp4") ?
+        <video src={selection.media} autoplay loop muted controls></video> :
+        <Image src={selection.media ? selection.media : media_not_found} width='100%'/>}
       { !selection.media &&
       <Modal.Body className='text-muted'>
         Opensea didn't return an image for this NFT. This usually happens for about an hour after a Timeshare (or any NFT) is created

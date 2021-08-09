@@ -121,14 +121,14 @@ app.get('/timesharemonth/:token_id', async function(req, res) {
 app.get('/timeshare/:token_id', async function(req, res) {
   const tokenId = req.params.token_id;
   console.log("requested tokenid", tokenId);
-  let [timeshareMonthIds, 
+  let [timeshareMonthIds,
         underlyingTokenURI,
         [underlying_contract, underlying_tokenId]] = await Promise.all([
     nftimesharemonth.getTimeshareMonths(tokenId),
     nftimeshare.underlyingTokenURI(tokenId),
     nftimeshare.getWrappedNFT(tokenId)
   ])
-  
+
   let underlyingSpecialCaseImage;
   if (SPECIAL_NFT_CONTRACTS.includes(underlying_contract.toLowerCase())) {
     // fuck zora, which separates tokenURI (image) from tokenMetadataURI (json)

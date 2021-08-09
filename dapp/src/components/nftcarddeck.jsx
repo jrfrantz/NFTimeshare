@@ -54,10 +54,13 @@ export const NFTCardDeck = (props) => {
             <Col md='6' lg='4' className='d-flex justify-content-center'>
               <a onClick={() => props.selectionFunc(nft)}>
                 <Card className='nft-card my-3 shadow' key={"nft_card_"+i}>
-
-                  <Card.Img variant="top" className='nft-card-img mt-auto'
-                    src={nft.media ? nft.media : media_not_found}
-                    />
+                  {nft.media.includes(".mp4") ?
+                    <video src={nft.media} autoplay loop muted controls></video>
+                      :
+                    <Card.Img variant="top" className='nft-card-img mt-auto'
+                      src={nft.media ? nft.media : media_not_found}
+                      />
+                    }
                   <Card.Title className='text-center mt-auto'>
                     {nft.name}
                   </Card.Title>
