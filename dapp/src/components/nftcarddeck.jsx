@@ -55,7 +55,7 @@ export const NFTCardDeck = (props) => {
               <a onClick={() => props.selectionFunc(nft)}>
                 <Card className='nft-card my-3 shadow' key={"nft_card_"+i}>
                   {nft.media.includes(".mp4") ?
-                    <video src={nft.media} autoplay loop muted controls></video>
+                    <video className='nft-card-img' src={nft.media} autoplay loop muted controls></video>
                       :
                     <Card.Img variant="top" className='nft-card-img mt-auto'
                       src={nft.media ? nft.media : media_not_found}
