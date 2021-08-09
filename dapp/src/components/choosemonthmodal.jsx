@@ -18,7 +18,7 @@ export const ChooseMonthModal = ({selection, clearFunc, monthLinks, ...props}) =
         </Modal.Title>
       </Modal.Header>
       { selection.media.includes(".mp4") ?
-        <video src={selection.media} autoplay loop muted controls></video> :
+        <video width="100%" height="100%" src={selection.media} autoplay loop muted controls></video> :
         <Image src={selection.media ? selection.media : media_not_found} width='100%'/>}
       { !selection.media &&
       <Modal.Body className='text-muted'>
