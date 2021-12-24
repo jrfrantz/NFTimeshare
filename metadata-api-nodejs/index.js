@@ -76,7 +76,7 @@ app.get('/timesharemonth/:token_id', async function(req, res) {
       ]);
     }
 
-    var underlyingMetadata = await axios.get(underlyingTokenURI);
+    var underlyingMetadata = await axios.get(urlify(underlyingTokenURI));
     if (underlyingMetadata.status !== 200) {
       res.send("Error in underlying NFT's metadata " + JSON.stringify(underlyingMetadata));
       return;
@@ -136,7 +136,7 @@ app.get('/timeshare/:token_id', async function(req, res) {
       zoracontract.tokenMetadataURI(underlying_tokenId),
       zoracontract.tokenURI(underlying_tokenId)]);
   }
-  var underlyingMetadata = await axios.get(underlyingTokenURI);
+  var underlyingMetadata = await axios.get(urlify(underlyingTokenURI));
 
   if (underlyingMetadata.status !== 200) {
     res.send("Error in underlying NFT's metadata " + JSON.stringify(underlyingMetadata));
@@ -363,7 +363,7 @@ function monthName(month) {
 
 function urlify(url) {
   //TODO check if it's ipfs:// vs http[s]://
-  return url;
+  return url.replace("ipfs://", "https://ipfs.io/ipfs/");
 }
 
 async function setupContracts() {
